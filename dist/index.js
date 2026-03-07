@@ -15,8 +15,8 @@ var e = t.ShadowRoot && (void 0 === t.ShadyCSS || t.ShadyCSS.nativeShadow) && "a
 var s = /* @__PURE__ */ Symbol();
 var o = /* @__PURE__ */ new WeakMap();
 var n = class {
-  constructor(t4, e5, o5) {
-    if (this._$cssResult$ = true, o5 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
+  constructor(t4, e5, o6) {
+    if (this._$cssResult$ = true, o6 !== s) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
     this.cssText = t4, this.t = e5;
   }
   get styleSheet() {
@@ -34,18 +34,18 @@ var n = class {
 };
 var r = (t4) => new n("string" == typeof t4 ? t4 : t4 + "", void 0, s);
 var i = (t4, ...e5) => {
-  const o5 = 1 === t4.length ? t4[0] : e5.reduce((e6, s4, o6) => e6 + ((t5) => {
+  const o6 = 1 === t4.length ? t4[0] : e5.reduce((e6, s4, o7) => e6 + ((t5) => {
     if (true === t5._$cssResult$) return t5.cssText;
     if ("number" == typeof t5) return t5;
     throw Error("Value passed to 'css' function must be a 'css' function result: " + t5 + ". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.");
-  })(s4) + t4[o6 + 1], t4[0]);
-  return new n(o5, t4, s);
+  })(s4) + t4[o7 + 1], t4[0]);
+  return new n(o6, t4, s);
 };
-var S = (s4, o5) => {
-  if (e) s4.adoptedStyleSheets = o5.map((t4) => t4 instanceof CSSStyleSheet ? t4 : t4.styleSheet);
-  else for (const e5 of o5) {
-    const o6 = document.createElement("style"), n5 = t.litNonce;
-    void 0 !== n5 && o6.setAttribute("nonce", n5), o6.textContent = e5.cssText, s4.appendChild(o6);
+var S = (s4, o6) => {
+  if (e) s4.adoptedStyleSheets = o6.map((t4) => t4 instanceof CSSStyleSheet ? t4 : t4.styleSheet);
+  else for (const e5 of o6) {
+    const o7 = document.createElement("style"), n5 = t.litNonce;
+    void 0 !== n5 && o7.setAttribute("nonce", n5), o7.textContent = e5.cssText, s4.appendChild(o7);
   }
 };
 var c = e ? (t4) => t4 : (t4) => t4 instanceof CSSStyleSheet ? ((t5) => {
@@ -107,14 +107,14 @@ var y = class extends HTMLElement {
     }
   }
   static getPropertyDescriptor(t4, s4, i5) {
-    const { get: e5, set: r4 } = h(this.prototype, t4) ?? { get() {
+    const { get: e5, set: r5 } = h(this.prototype, t4) ?? { get() {
       return this[s4];
     }, set(t5) {
       this[s4] = t5;
     } };
     return { get: e5, set(s5) {
       const h3 = e5?.call(this);
-      r4?.call(this, s5), this.requestUpdate(t4, h3, i5);
+      r5?.call(this, s5), this.requestUpdate(t4, h3, i5);
     }, configurable: true, enumerable: true };
   }
   static getPropertyOptions(t4) {
@@ -199,20 +199,20 @@ var y = class extends HTMLElement {
     if (void 0 !== e5 && this._$Em !== e5) {
       const t5 = i5.getPropertyOptions(e5), h3 = "function" == typeof t5.converter ? { fromAttribute: t5.converter } : void 0 !== t5.converter?.fromAttribute ? t5.converter : u;
       this._$Em = e5;
-      const r4 = h3.fromAttribute(s4, t5.type);
-      this[e5] = r4 ?? this._$Ej?.get(e5) ?? r4, this._$Em = null;
+      const r5 = h3.fromAttribute(s4, t5.type);
+      this[e5] = r5 ?? this._$Ej?.get(e5) ?? r5, this._$Em = null;
     }
   }
   requestUpdate(t4, s4, i5, e5 = false, h3) {
     if (void 0 !== t4) {
-      const r4 = this.constructor;
-      if (false === e5 && (h3 = this[t4]), i5 ??= r4.getPropertyOptions(t4), !((i5.hasChanged ?? f)(h3, s4) || i5.useDefault && i5.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r4._$Eu(t4, i5)))) return;
+      const r5 = this.constructor;
+      if (false === e5 && (h3 = this[t4]), i5 ??= r5.getPropertyOptions(t4), !((i5.hasChanged ?? f)(h3, s4) || i5.useDefault && i5.reflect && h3 === this._$Ej?.get(t4) && !this.hasAttribute(r5._$Eu(t4, i5)))) return;
       this.C(t4, s4, i5);
     }
     false === this.isUpdatePending && (this._$ES = this._$EP());
   }
-  C(t4, s4, { useDefault: i5, reflect: e5, wrapped: h3 }, r4) {
-    i5 && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t4) && (this._$Ej.set(t4, r4 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r4) || (this._$AL.has(t4) || (this.hasUpdated || i5 || (s4 = void 0), this._$AL.set(t4, s4)), true === e5 && this._$Em !== t4 && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t4));
+  C(t4, s4, { useDefault: i5, reflect: e5, wrapped: h3 }, r5) {
+    i5 && !(this._$Ej ??= /* @__PURE__ */ new Map()).has(t4) && (this._$Ej.set(t4, r5 ?? s4 ?? this[t4]), true !== h3 || void 0 !== r5) || (this._$AL.has(t4) || (this.hasUpdated || i5 || (s4 = void 0), this._$AL.set(t4, s4)), true === e5 && this._$Em !== t4 && (this._$Eq ??= /* @__PURE__ */ new Set()).add(t4));
   }
   async _$EP() {
     this.isUpdatePending = true;
@@ -325,7 +325,7 @@ var N = (t4, i5) => {
 };
 var S2 = class _S {
   constructor({ strings: t4, _$litType$: i5 }, e5) {
-    let r4;
+    let r5;
     this.parts = [];
     let l3 = 0, a3 = 0;
     const u3 = t4.length - 1, d3 = this.parts, [f3, v2] = N(t4, i5);
@@ -333,24 +333,24 @@ var S2 = class _S {
       const t5 = this.el.content.firstChild;
       t5.replaceWith(...t5.childNodes);
     }
-    for (; null !== (r4 = P.nextNode()) && d3.length < u3; ) {
-      if (1 === r4.nodeType) {
-        if (r4.hasAttributes()) for (const t5 of r4.getAttributeNames()) if (t5.endsWith(h2)) {
-          const i6 = v2[a3++], s4 = r4.getAttribute(t5).split(o3), e6 = /([.?@])?(.*)/.exec(i6);
-          d3.push({ type: 1, index: l3, name: e6[2], strings: s4, ctor: "." === e6[1] ? I : "?" === e6[1] ? L : "@" === e6[1] ? z : H }), r4.removeAttribute(t5);
-        } else t5.startsWith(o3) && (d3.push({ type: 6, index: l3 }), r4.removeAttribute(t5));
-        if (y2.test(r4.tagName)) {
-          const t5 = r4.textContent.split(o3), i6 = t5.length - 1;
+    for (; null !== (r5 = P.nextNode()) && d3.length < u3; ) {
+      if (1 === r5.nodeType) {
+        if (r5.hasAttributes()) for (const t5 of r5.getAttributeNames()) if (t5.endsWith(h2)) {
+          const i6 = v2[a3++], s4 = r5.getAttribute(t5).split(o3), e6 = /([.?@])?(.*)/.exec(i6);
+          d3.push({ type: 1, index: l3, name: e6[2], strings: s4, ctor: "." === e6[1] ? I : "?" === e6[1] ? L : "@" === e6[1] ? z : H }), r5.removeAttribute(t5);
+        } else t5.startsWith(o3) && (d3.push({ type: 6, index: l3 }), r5.removeAttribute(t5));
+        if (y2.test(r5.tagName)) {
+          const t5 = r5.textContent.split(o3), i6 = t5.length - 1;
           if (i6 > 0) {
-            r4.textContent = s2 ? s2.emptyScript : "";
-            for (let s4 = 0; s4 < i6; s4++) r4.append(t5[s4], c3()), P.nextNode(), d3.push({ type: 2, index: ++l3 });
-            r4.append(t5[i6], c3());
+            r5.textContent = s2 ? s2.emptyScript : "";
+            for (let s4 = 0; s4 < i6; s4++) r5.append(t5[s4], c3()), P.nextNode(), d3.push({ type: 2, index: ++l3 });
+            r5.append(t5[i6], c3());
           }
         }
-      } else if (8 === r4.nodeType) if (r4.data === n3) d3.push({ type: 2, index: l3 });
+      } else if (8 === r5.nodeType) if (r5.data === n3) d3.push({ type: 2, index: l3 });
       else {
         let t5 = -1;
-        for (; -1 !== (t5 = r4.data.indexOf(o3, t5 + 1)); ) d3.push({ type: 7, index: l3 }), t5 += o3.length - 1;
+        for (; -1 !== (t5 = r5.data.indexOf(o3, t5 + 1)); ) d3.push({ type: 7, index: l3 }), t5 += o3.length - 1;
       }
       l3++;
     }
@@ -363,8 +363,8 @@ var S2 = class _S {
 function M(t4, i5, s4 = t4, e5) {
   if (i5 === E) return i5;
   let h3 = void 0 !== e5 ? s4._$Co?.[e5] : s4._$Cl;
-  const o5 = a2(i5) ? void 0 : i5._$litDirective$;
-  return h3?.constructor !== o5 && (h3?._$AO?.(false), void 0 === o5 ? h3 = void 0 : (h3 = new o5(t4), h3._$AT(t4, s4, e5)), void 0 !== e5 ? (s4._$Co ??= [])[e5] = h3 : s4._$Cl = h3), void 0 !== h3 && (i5 = M(t4, h3._$AS(t4, i5.values), h3, e5)), i5;
+  const o6 = a2(i5) ? void 0 : i5._$litDirective$;
+  return h3?.constructor !== o6 && (h3?._$AO?.(false), void 0 === o6 ? h3 = void 0 : (h3 = new o6(t4), h3._$AT(t4, s4, e5)), void 0 !== e5 ? (s4._$Co ??= [])[e5] = h3 : s4._$Cl = h3), void 0 !== h3 && (i5 = M(t4, h3._$AS(t4, i5.values), h3, e5)), i5;
 }
 var R = class {
   constructor(t4, i5) {
@@ -379,13 +379,13 @@ var R = class {
   u(t4) {
     const { el: { content: i5 }, parts: s4 } = this._$AD, e5 = (t4?.creationScope ?? l2).importNode(i5, true);
     P.currentNode = e5;
-    let h3 = P.nextNode(), o5 = 0, n5 = 0, r4 = s4[0];
-    for (; void 0 !== r4; ) {
-      if (o5 === r4.index) {
+    let h3 = P.nextNode(), o6 = 0, n5 = 0, r5 = s4[0];
+    for (; void 0 !== r5; ) {
+      if (o6 === r5.index) {
         let i6;
-        2 === r4.type ? i6 = new k(h3, h3.nextSibling, this, t4) : 1 === r4.type ? i6 = new r4.ctor(h3, r4.name, r4.strings, this, t4) : 6 === r4.type && (i6 = new Z(h3, this, t4)), this._$AV.push(i6), r4 = s4[++n5];
+        2 === r5.type ? i6 = new k(h3, h3.nextSibling, this, t4) : 1 === r5.type ? i6 = new r5.ctor(h3, r5.name, r5.strings, this, t4) : 6 === r5.type && (i6 = new Z(h3, this, t4)), this._$AV.push(i6), r5 = s4[++n5];
       }
-      o5 !== r4?.index && (h3 = P.nextNode(), o5++);
+      o6 !== r5?.index && (h3 = P.nextNode(), o6++);
     }
     return P.currentNode = l2, e5;
   }
@@ -465,14 +465,14 @@ var H = class {
   }
   _$AI(t4, i5 = this, s4, e5) {
     const h3 = this.strings;
-    let o5 = false;
-    if (void 0 === h3) t4 = M(this, t4, i5, 0), o5 = !a2(t4) || t4 !== this._$AH && t4 !== E, o5 && (this._$AH = t4);
+    let o6 = false;
+    if (void 0 === h3) t4 = M(this, t4, i5, 0), o6 = !a2(t4) || t4 !== this._$AH && t4 !== E, o6 && (this._$AH = t4);
     else {
       const e6 = t4;
-      let n5, r4;
-      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r4 = M(this, e6[s4 + n5], i5, n5), r4 === E && (r4 = this._$AH[n5]), o5 ||= !a2(r4) || r4 !== this._$AH[n5], r4 === A ? t4 = A : t4 !== A && (t4 += (r4 ?? "") + h3[n5 + 1]), this._$AH[n5] = r4;
+      let n5, r5;
+      for (t4 = h3[0], n5 = 0; n5 < h3.length - 1; n5++) r5 = M(this, e6[s4 + n5], i5, n5), r5 === E && (r5 = this._$AH[n5]), o6 ||= !a2(r5) || r5 !== this._$AH[n5], r5 === A ? t4 = A : t4 !== A && (t4 += (r5 ?? "") + h3[n5 + 1]), this._$AH[n5] = r5;
     }
-    o5 && !e5 && this.j(t4);
+    o6 && !e5 && this.j(t4);
   }
   j(t4) {
     t4 === A ? this.element.removeAttribute(this.name) : this.element.setAttribute(this.name, t4 ?? "");
@@ -541,8 +541,8 @@ var i4 = class extends y {
     return this.renderOptions.renderBefore ??= t4.firstChild, t4;
   }
   update(t4) {
-    const r4 = this.render();
-    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t4), this._$Do = D(r4, this.renderRoot, this.renderOptions);
+    const r5 = this.render();
+    this.hasUpdated || (this.renderOptions.isConnected = this.isConnected), super.update(t4), this._$Do = D(r5, this.renderRoot, this.renderOptions);
   }
   connectedCallback() {
     super.connectedCallback(), this._$Do?.setConnected(true);
@@ -560,27 +560,307 @@ o4?.({ LitElement: i4 });
 (s3.litElementVersions ??= []).push("4.2.2");
 
 // node_modules/@lit/reactive-element/decorators/custom-element.js
-var t3 = (t4) => (e5, o5) => {
-  void 0 !== o5 ? o5.addInitializer(() => {
+var t3 = (t4) => (e5, o6) => {
+  void 0 !== o6 ? o6.addInitializer(() => {
     customElements.define(t4, e5);
   }) : customElements.define(t4, e5);
 };
 
+// node_modules/@lit/reactive-element/decorators/property.js
+var o5 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
+var r4 = (t4 = o5, e5, r5) => {
+  const { kind: n5, metadata: i5 } = r5;
+  let s4 = globalThis.litPropertyMetadata.get(i5);
+  if (void 0 === s4 && globalThis.litPropertyMetadata.set(i5, s4 = /* @__PURE__ */ new Map()), "setter" === n5 && ((t4 = Object.create(t4)).wrapped = true), s4.set(r5.name, t4), "accessor" === n5) {
+    const { name: o6 } = r5;
+    return { set(r6) {
+      const n6 = e5.get.call(this);
+      e5.set.call(this, r6), this.requestUpdate(o6, n6, t4, true, r6);
+    }, init(e6) {
+      return void 0 !== e6 && this.C(o6, void 0, t4, e6), e6;
+    } };
+  }
+  if ("setter" === n5) {
+    const { name: o6 } = r5;
+    return function(r6) {
+      const n6 = this[o6];
+      e5.call(this, r6), this.requestUpdate(o6, n6, t4, true, r6);
+    };
+  }
+  throw Error("Unsupported decorator location: " + n5);
+};
+function n4(t4) {
+  return (e5, o6) => "object" == typeof o6 ? r4(t4, e5, o6) : ((t5, e6, o7) => {
+    const r5 = e6.hasOwnProperty(o7);
+    return e6.constructor.createProperty(o7, t5), r5 ? Object.getOwnPropertyDescriptor(e6, o7) : void 0;
+  })(t4, e5, o6);
+}
+
 // src/index.ts
-var ShortyBody = class extends i4 {
+var ShortyKey = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.hotkey = "";
+  }
   render() {
     return b2`
-            <div>
-<!--                Body-->
+            <div class="shorty-key">${this.hotkey}</div>
+        `;
+  }
+};
+ShortyKey.styles = i`
+        .shorty-key {
+            padding: 2px 4px;
+    
+            background: var(--shorty-key-background-color);
+            color: var(--shorty-key-text-color);
+    
+            border-radius: var(--shorty-key-border-radius);
+            font-size: var(--shorty-key-font-size);
+            text-align: center;
+            
+            font-weight: lighter;
+        }
+    `;
+__decorateClass([
+  n4()
+], ShortyKey.prototype, "hotkey", 2);
+ShortyKey = __decorateClass([
+  t3("shorty-key")
+], ShortyKey);
+var ShortyHeader = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.breadcrumbs = ["Home", "Library", "Data", "Reports"];
+  }
+  render() {
+    return b2`
+            <div class="shorty-header">
+                <div class="breadcrumb-list">
+                    ${this.breadcrumbs.map((breadcrumb) => b2`
+                        <button>${breadcrumb}</button>
+                    `)}
+                </div>
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search..."></input>
+                </div>
+            </div>
+        `;
+  }
+};
+ShortyHeader.styles = i`
+        .shorty-header {
+            display: flex;
+            flex-direction: column;
+            row-gap: 1.25em;
+            
+            padding: 1.25em;
+        }
+        
+        .breadcrumb-list {
+            float: left;
+            display: flex;
+            flex-direction: row;
+            gap: 0.5em;
+        }
+        
+        .breadcrumb-list button {
+            margin: 0;
+            padding: 2px 4px;
+
+            background: var(--shorty-key-background-color);
+            color: var(--shorty-key-text-color);
+            border: none;
+            
+            border-radius: var(--shorty-key-border-radius);
+            font-size: var(--shorty-key-font-size);
+            text-align: center;
+        }
+        
+        .search-container {
+            float: right;
+        }
+        
+        .search-container input {
+            border: none;
+            background: none;
+            outline: none;
+            
+            width: 100%;
+                
+            font-size: 1em;
+            color: var(--shorty-text-color);
+        }
+    `;
+__decorateClass([
+  n4()
+], ShortyHeader.prototype, "breadcrumbs", 2);
+ShortyHeader = __decorateClass([
+  t3("shorty-header")
+], ShortyHeader);
+var ShortyFooter = class extends i4 {
+  render() {
+    return b2`
+            <div class="shorty-footer">
+              <span class="help">
+                <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280">
+                  <path d="M1013 376c0 73.4-.4 113.3-1.1 120.2a159.9 159.9 0 0 1-90.2 127.3c-20 9.6-36.7 14-59.2 15.5-7.1.5-121.9.9-255 1h-242l95.5-95.5 95.5-95.5-38.3-38.2-38.2-38.3-160 160c-88 88-160 160.4-160 161 0 .6 72 73 160 161l160 160 38.2-38.3 38.3-38.2-95.5-95.5-95.5-95.5h251.1c252.9 0 259.8-.1 281.4-3.6 72.1-11.8 136.9-54.1 178.5-116.4 8.6-12.9 22.6-40.5 28-55.4 4.4-12 10.7-36.1 13.1-50.6 1.6-9.6 1.8-21 2.1-132.8l.4-122.2H1013v110z"></path>
+                </svg>
+                to select
+              </span>
+                <span class="help">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M0 0h24v24H0V0z" fill="none"></path>
+                  <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"></path>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M0 0h24v24H0V0z" fill="none"></path>
+                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"></path>
+                </svg>
+                to navigate
+              </span>
+                <span class="help">
+                <shorty-key hotkey="esc"></shorty-key>
+                to close
+              </span>
+                <span class="help">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                        d="M6.707 4.879A3 3 0 018.828 4H15a3 3 0 013 3v6a3 3 0 01-3 3H8.828a3 3 0 01-2.12-.879l-4.415-4.414a1 1 0 010-1.414l4.414-4.414zm4 2.414a1 1 0 00-1.414 1.414L10.586 10l-1.293 1.293a1 1 0 101.414 1.414L12 11.414l1.293 1.293a1 1 0 001.414-1.414L13.414 10l1.293-1.293a1 1 0 00-1.414-1.414L12 8.586l-1.293-1.293z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                move to parent
+              </span>
+            </div>
+        `;
+  }
+};
+ShortyFooter.styles = i`
+        .shorty-footer {
+            display: flex;
+            flex-direction: row;
+            gap: 1em;
+            background: var(--shorty-footer-background);
+            height: 25px;
+            margin-top: auto;
+            padding: 0.5em 1em
+        }
+
+        .shorty-footer svg {
+            width: 1em;
+            height: 1em;
+            padding: 0.06em 0.25em;
+            fill: var(--shorty-secondary-text-color);
+            background-color: var(--shorty-secondary-background-color);
+            border-radius: var(--shorty-key-border-radius);
+            font-size: var(--shorty-key-font-size);
+        }
+
+        .shorty-footer .help {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25em;
+            text-align: center;
+            font-size: 0.75em;
+            color: var(--shorty-secondary-text-color);
+        }
+    `;
+ShortyFooter = __decorateClass([
+  t3("shorty-footer")
+], ShortyFooter);
+var ShortyBody = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.shorties = [
+      {
+        id: "1",
+        name: "Shorty 1",
+        icon: "icon-1",
+        hotkeys: ["CTRL", "+", "P"],
+        keywords: "shorty, 1",
+        section: {
+          name: "Section 1",
+          priority: 1
+        }
+      },
+      {
+        id: "2",
+        name: "Shorty 2",
+        icon: "icon-2",
+        keywords: "shorty, 2",
+        section: {
+          name: "Section 2",
+          priority: 2
+        }
+      }
+    ];
+  }
+  render() {
+    return b2`
+            <div class="shorty-body">
+                ${this.shorties.map((shorty) => b2`
+                    <div class="shorty-action">
+                        <div class="shorty-icon"></div>
+                        <p class="shorty-name">
+                            ${shorty.name}
+                        </p>
+                        <div class="shorty-hotkeys">
+                            ${shorty.hotkeys && shorty.hotkeys.length > 0 ? b2`
+                                ${shorty.hotkeys.map((hotkey) => b2`
+                                    <shorty-key hotkey="${hotkey}"></shorty-key>
+                                `)}
+                            ` : ""}
+                        </div>
+                    </div>
+                `)}
             </div>
         `;
   }
 };
 ShortyBody.styles = i`
-        div {
-            background-color: red;
+        .shorty-body {
+            display: flex;
+            flex-direction: column;
+            padding: 0.5em 0;
+
+            height: var(--shorty-actions-height);
+            
+            border-top: 1px solid rgb(239, 241, 244);
+            border-bottom: 1px solid rgb(239, 241, 244);
+        }
+        
+        .shorty-action {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            
+            padding: 0.75em 1em;
+        }
+        
+        .shorty-icon {
+            width: 12px;
+            height: 12px;
+            background-color: var(--shorty-secondary-background-color);
+            border-radius: 50%;
+            margin-right: 1em;
+        }
+        
+        .shorty-name {
+            flex-grow: 1;
+            color: var(--shorty-text-color);
+        }
+        
+        .shorty-hotkeys {
+            display: flex;
+            flex-direction: row;
+            gap: 0.2em;
         }
     `;
+__decorateClass([
+  n4()
+], ShortyBody.prototype, "shorties", 2);
 ShortyBody = __decorateClass([
   t3("shorty-body")
 ], ShortyBody);
@@ -588,25 +868,63 @@ var HeyShorty = class extends i4 {
   render() {
     return b2`
             <div id="content">
+                <shorty-header></shorty-header>
                 <shorty-body></shorty-body>
+                <shorty-footer></shorty-footer>
             </div>
         `;
   }
 };
 HeyShorty.styles = i`
+        :host {
+            --shorty-width: 640px;
+            --shorty-text-color: rgb(60, 65, 73);
+            --shorty-font-size: 16px;
+            --shorty-top: 20%;
+
+            --shorty-key-border-radius: 0.25em;
+            --shorty-key-background-color: rgb(239, 241, 244);
+            --shorty-key-text-color: rgb(107, 111, 118);
+            --shorty-key-font-size: 0.75em;
+            
+            --shorty-accent-color: rgb(110, 94, 210);
+            --shorty-secondary-background-color: rgb(239, 241, 244);
+            --shorty-secondary-text-color: rgb(107, 111, 118);
+
+            --shorty-selected-background: rgb(248, 249, 251);
+
+            --shorty-content-background: #fff;
+            --shorty-content-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
+            --shorty-content-border-radius: 0.5em;
+
+            --shorty-actions-height: 300px;
+            --shorty-group-text-color: rgb(144, 149, 157);
+
+            --shorty-footer-background: rgba(242, 242, 242, 0.4);
+
+            --shorty-placeholder-color: #8e8e8e;
+
+            --shorty-z-index: 99999;
+        }
+        
         #content {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
-            top: 25%;
-            width: 50%;
+            top: var(--shorty-top);
+            
+            display: flex;
+            flex-direction: column;
             
             min-height: 400px;
-            max-width: 640px;
+            max-width: var(--shorty-width);
+            min-width: 600px; //TODO: remove this
+            background-color: var(--shorty-content-background);
             
-            box-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
+            box-shadow: var(--shorty-content-shadow);
+            border-radius: var(--shorty-content-border-radius);
             
-            border-radius: 0.5em;
+            z-index: var(--shorty-z-index);
         }
     `;
 HeyShorty = __decorateClass([
@@ -614,7 +932,10 @@ HeyShorty = __decorateClass([
 ], HeyShorty);
 export {
   HeyShorty,
-  ShortyBody
+  ShortyBody,
+  ShortyFooter,
+  ShortyHeader,
+  ShortyKey
 };
 /*! Bundled license information:
 

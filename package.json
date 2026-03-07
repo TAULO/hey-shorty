@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "start": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
+    "start": "tsc --watch",
     "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm"
   },
   "dependencies": {
