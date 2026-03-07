@@ -596,6 +596,570 @@ function n4(t4) {
   })(t4, e5, o6);
 }
 
+// node_modules/hotkeys-js/dist/hotkeys-js.js
+var isff = typeof navigator !== "undefined" ? navigator.userAgent.toLowerCase().indexOf("firefox") > 0 : false;
+function addEvent(object, event, method, useCapture) {
+  if (object.addEventListener) {
+    object.addEventListener(event, method, useCapture);
+  } else if (object.attachEvent) {
+    object.attachEvent(`on${event}`, method);
+  }
+}
+function removeEvent(object, event, method, useCapture) {
+  if (!object) return;
+  if (object.removeEventListener) {
+    object.removeEventListener(event, method, useCapture);
+  } else if (object.detachEvent) {
+    object.detachEvent(`on${event}`, method);
+  }
+}
+function getMods(modifier, key) {
+  const modsKeys = key.slice(0, key.length - 1);
+  const modsCodes = [];
+  for (let i5 = 0; i5 < modsKeys.length; i5++) {
+    modsCodes.push(modifier[modsKeys[i5].toLowerCase()]);
+  }
+  return modsCodes;
+}
+function getKeys(key) {
+  if (typeof key !== "string") key = "";
+  key = key.replace(/\s/g, "");
+  const keys = key.split(",");
+  let index = keys.lastIndexOf("");
+  for (; index >= 0; ) {
+    keys[index - 1] += ",";
+    keys.splice(index, 1);
+    index = keys.lastIndexOf("");
+  }
+  return keys;
+}
+function compareArray(a1, a22) {
+  const arr1 = a1.length >= a22.length ? a1 : a22;
+  const arr2 = a1.length >= a22.length ? a22 : a1;
+  let isIndex = true;
+  for (let i5 = 0; i5 < arr1.length; i5++) {
+    if (arr2.indexOf(arr1[i5]) === -1) isIndex = false;
+  }
+  return isIndex;
+}
+function getLayoutIndependentKeyCode(event) {
+  let key = event.keyCode || event.which || event.charCode;
+  if (event.code && /^Key[A-Z]$/.test(event.code)) {
+    key = event.code.charCodeAt(3);
+  }
+  return key;
+}
+var _keyMap = {
+  backspace: 8,
+  "\u232B": 8,
+  tab: 9,
+  clear: 12,
+  enter: 13,
+  "\u21A9": 13,
+  return: 13,
+  esc: 27,
+  escape: 27,
+  space: 32,
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+  /// https://w3c.github.io/uievents/#events-keyboard-key-location
+  arrowup: 38,
+  arrowdown: 40,
+  arrowleft: 37,
+  arrowright: 39,
+  del: 46,
+  delete: 46,
+  ins: 45,
+  insert: 45,
+  home: 36,
+  end: 35,
+  pageup: 33,
+  pagedown: 34,
+  capslock: 20,
+  num_0: 96,
+  num_1: 97,
+  num_2: 98,
+  num_3: 99,
+  num_4: 100,
+  num_5: 101,
+  num_6: 102,
+  num_7: 103,
+  num_8: 104,
+  num_9: 105,
+  num_multiply: 106,
+  num_add: 107,
+  num_enter: 108,
+  num_subtract: 109,
+  num_decimal: 110,
+  num_divide: 111,
+  "\u21EA": 20,
+  ",": 188,
+  ".": 190,
+  "/": 191,
+  "`": 192,
+  "-": isff ? 173 : 189,
+  "=": isff ? 61 : 187,
+  ";": isff ? 59 : 186,
+  "'": 222,
+  "{": 219,
+  "}": 221,
+  "[": 219,
+  "]": 221,
+  "\\": 220
+};
+var _modifier = {
+  // shiftKey
+  "\u21E7": 16,
+  shift: 16,
+  // altKey
+  "\u2325": 18,
+  alt: 18,
+  option: 18,
+  // ctrlKey
+  "\u2303": 17,
+  ctrl: 17,
+  control: 17,
+  // metaKey
+  "\u2318": 91,
+  cmd: 91,
+  meta: 91,
+  command: 91
+};
+var modifierMap = {
+  16: "shiftKey",
+  18: "altKey",
+  17: "ctrlKey",
+  91: "metaKey",
+  shiftKey: 16,
+  ctrlKey: 17,
+  altKey: 18,
+  metaKey: 91
+};
+var _mods = {
+  16: false,
+  18: false,
+  17: false,
+  91: false
+};
+var _handlers = {};
+for (let k2 = 1; k2 < 20; k2++) {
+  _keyMap[`f${k2}`] = 111 + k2;
+}
+var _downKeys = [];
+var winListendFocus = null;
+var winListendFullscreen = null;
+var _scope = "all";
+var elementEventMap = /* @__PURE__ */ new Map();
+var code = (x2) => _keyMap[x2.toLowerCase()] || _modifier[x2.toLowerCase()] || x2.toUpperCase().charCodeAt(0);
+var getKey = (x2) => Object.keys(_keyMap).find((k2) => _keyMap[k2] === x2);
+var getModifier = (x2) => Object.keys(_modifier).find((k2) => _modifier[k2] === x2);
+var setScope = (scope) => {
+  _scope = scope || "all";
+};
+var getScope = () => {
+  return _scope || "all";
+};
+var getPressedKeyCodes = () => {
+  return _downKeys.slice(0);
+};
+var getPressedKeyString = () => {
+  return _downKeys.map(
+    (c4) => getKey(c4) || getModifier(c4) || String.fromCharCode(c4)
+  );
+};
+var getAllKeyCodes = () => {
+  const result = [];
+  Object.keys(_handlers).forEach((k2) => {
+    _handlers[k2].forEach(({ key, scope, mods, shortcut }) => {
+      result.push({
+        scope,
+        shortcut,
+        mods,
+        keys: key.split("+").map((v2) => code(v2))
+      });
+    });
+  });
+  return result;
+};
+var filter = (event) => {
+  const target = event.target || event.srcElement;
+  const { tagName } = target;
+  let flag = true;
+  const isInput = tagName === "INPUT" && ![
+    "checkbox",
+    "radio",
+    "range",
+    "button",
+    "file",
+    "reset",
+    "submit",
+    "color"
+  ].includes(target.type);
+  if (target.isContentEditable || (isInput || tagName === "TEXTAREA" || tagName === "SELECT") && !target.readOnly) {
+    flag = false;
+  }
+  return flag;
+};
+var isPressed = (keyCode) => {
+  if (typeof keyCode === "string") {
+    keyCode = code(keyCode);
+  }
+  return _downKeys.indexOf(keyCode) !== -1;
+};
+var deleteScope = (scope, newScope) => {
+  let handlers;
+  let i5;
+  if (!scope) scope = getScope();
+  for (const key in _handlers) {
+    if (Object.prototype.hasOwnProperty.call(_handlers, key)) {
+      handlers = _handlers[key];
+      for (i5 = 0; i5 < handlers.length; ) {
+        if (handlers[i5].scope === scope) {
+          const deleteItems = handlers.splice(i5, 1);
+          deleteItems.forEach(({ element }) => removeKeyEvent(element));
+        } else {
+          i5++;
+        }
+      }
+    }
+  }
+  if (getScope() === scope) setScope(newScope || "all");
+};
+function clearModifier(event) {
+  let key = getLayoutIndependentKeyCode(event);
+  if (event.key && event.key.toLowerCase() === "capslock") {
+    key = code(event.key);
+  }
+  const i5 = _downKeys.indexOf(key);
+  if (i5 >= 0) {
+    _downKeys.splice(i5, 1);
+  }
+  if (event.key && event.key.toLowerCase() === "meta") {
+    _downKeys.splice(0, _downKeys.length);
+  }
+  if (key === 93 || key === 224) key = 91;
+  if (key in _mods) {
+    _mods[key] = false;
+    for (const k2 in _modifier)
+      if (_modifier[k2] === key) hotkeys[k2] = false;
+  }
+}
+var unbind = (keysInfo, ...args) => {
+  if (typeof keysInfo === "undefined") {
+    Object.keys(_handlers).forEach((key) => {
+      if (Array.isArray(_handlers[key])) {
+        _handlers[key].forEach((info) => eachUnbind(info));
+      }
+      delete _handlers[key];
+    });
+    removeKeyEvent(null);
+  } else if (Array.isArray(keysInfo)) {
+    keysInfo.forEach((info) => {
+      if (info.key) eachUnbind(info);
+    });
+  } else if (typeof keysInfo === "object") {
+    if (keysInfo.key) eachUnbind(keysInfo);
+  } else if (typeof keysInfo === "string") {
+    let [scope, method] = args;
+    if (typeof scope === "function") {
+      method = scope;
+      scope = "";
+    }
+    eachUnbind({
+      key: keysInfo,
+      scope,
+      method,
+      splitKey: "+"
+    });
+  }
+};
+var eachUnbind = ({
+  key,
+  scope,
+  method,
+  splitKey = "+"
+}) => {
+  const multipleKeys = getKeys(key);
+  multipleKeys.forEach((originKey) => {
+    const unbindKeys = originKey.split(splitKey);
+    const len = unbindKeys.length;
+    const lastKey = unbindKeys[len - 1];
+    const keyCode = lastKey === "*" ? "*" : code(lastKey);
+    if (!_handlers[keyCode]) return;
+    if (!scope) scope = getScope();
+    const mods = len > 1 ? getMods(_modifier, unbindKeys) : [];
+    const unbindElements = [];
+    _handlers[keyCode] = _handlers[keyCode].filter((record) => {
+      const isMatchingMethod = method ? record.method === method : true;
+      const isUnbind = isMatchingMethod && record.scope === scope && compareArray(record.mods, mods);
+      if (isUnbind) unbindElements.push(record.element);
+      return !isUnbind;
+    });
+    unbindElements.forEach((element) => removeKeyEvent(element));
+  });
+};
+function eventHandler(event, handler, scope, element) {
+  if (handler.element !== element) {
+    return;
+  }
+  let modifiersMatch;
+  if (handler.scope === scope || handler.scope === "all") {
+    modifiersMatch = handler.mods.length > 0;
+    for (const y3 in _mods) {
+      if (Object.prototype.hasOwnProperty.call(_mods, y3)) {
+        if (!_mods[y3] && handler.mods.indexOf(+y3) > -1 || _mods[y3] && handler.mods.indexOf(+y3) === -1) {
+          modifiersMatch = false;
+        }
+      }
+    }
+    if (handler.mods.length === 0 && !_mods[16] && !_mods[18] && !_mods[17] && !_mods[91] || modifiersMatch || handler.shortcut === "*") {
+      handler.keys = [];
+      handler.keys = handler.keys.concat(_downKeys);
+      if (handler.method(event, handler) === false) {
+        if (event.preventDefault) event.preventDefault();
+        else event.returnValue = false;
+        if (event.stopPropagation) event.stopPropagation();
+        if (event.cancelBubble) event.cancelBubble = true;
+      }
+    }
+  }
+}
+function dispatch(event, element) {
+  const asterisk = _handlers["*"];
+  let key = getLayoutIndependentKeyCode(event);
+  if (event.key && event.key.toLowerCase() === "capslock") {
+    return;
+  }
+  const filterFn = hotkeys.filter || filter;
+  if (!filterFn.call(this, event)) return;
+  if (key === 93 || key === 224) key = 91;
+  if (_downKeys.indexOf(key) === -1 && key !== 229) _downKeys.push(key);
+  ["metaKey", "ctrlKey", "altKey", "shiftKey"].forEach((keyName) => {
+    const keyNum = modifierMap[keyName];
+    if (event[keyName] && _downKeys.indexOf(keyNum) === -1) {
+      _downKeys.push(keyNum);
+    } else if (!event[keyName] && _downKeys.indexOf(keyNum) > -1) {
+      _downKeys.splice(_downKeys.indexOf(keyNum), 1);
+    } else if (keyName === "metaKey" && event[keyName]) {
+      _downKeys = _downKeys.filter((k2) => k2 in modifierMap || k2 === key);
+    }
+  });
+  if (key in _mods) {
+    _mods[key] = true;
+    for (const k2 in _modifier) {
+      if (Object.prototype.hasOwnProperty.call(_modifier, k2)) {
+        const eventKey = modifierMap[_modifier[k2]];
+        hotkeys[k2] = event[eventKey];
+      }
+    }
+    if (!asterisk) return;
+  }
+  for (const e5 in _mods) {
+    if (Object.prototype.hasOwnProperty.call(_mods, e5)) {
+      _mods[e5] = event[modifierMap[e5]];
+    }
+  }
+  if (event.getModifierState && !(event.altKey && !event.ctrlKey) && event.getModifierState("AltGraph")) {
+    if (_downKeys.indexOf(17) === -1) {
+      _downKeys.push(17);
+    }
+    if (_downKeys.indexOf(18) === -1) {
+      _downKeys.push(18);
+    }
+    _mods[17] = true;
+    _mods[18] = true;
+  }
+  const scope = getScope();
+  if (asterisk) {
+    for (let i5 = 0; i5 < asterisk.length; i5++) {
+      if (asterisk[i5].scope === scope && (event.type === "keydown" && asterisk[i5].keydown || event.type === "keyup" && asterisk[i5].keyup)) {
+        eventHandler(event, asterisk[i5], scope, element);
+      }
+    }
+  }
+  if (!(key in _handlers)) return;
+  const handlerKey = _handlers[key];
+  const keyLen = handlerKey.length;
+  for (let i5 = 0; i5 < keyLen; i5++) {
+    if (event.type === "keydown" && handlerKey[i5].keydown || event.type === "keyup" && handlerKey[i5].keyup) {
+      if (handlerKey[i5].key) {
+        const record = handlerKey[i5];
+        const { splitKey } = record;
+        const keyShortcut = record.key.split(splitKey);
+        const _downKeysCurrent = [];
+        for (let a3 = 0; a3 < keyShortcut.length; a3++) {
+          _downKeysCurrent.push(code(keyShortcut[a3]));
+        }
+        if (_downKeysCurrent.sort().join("") === _downKeys.sort().join("")) {
+          eventHandler(event, record, scope, element);
+        }
+      }
+    }
+  }
+}
+var hotkeys = function hotkeys2(key, option, method) {
+  _downKeys = [];
+  const keys = getKeys(key);
+  let mods = [];
+  let scope = "all";
+  let element = document;
+  let i5 = 0;
+  let keyup = false;
+  let keydown = true;
+  let splitKey = "+";
+  let capture = false;
+  let single = false;
+  if (method === void 0 && typeof option === "function") {
+    method = option;
+  }
+  if (Object.prototype.toString.call(option) === "[object Object]") {
+    const opts = option;
+    if (opts.scope) scope = opts.scope;
+    if (opts.element) element = opts.element;
+    if (opts.keyup) keyup = opts.keyup;
+    if (opts.keydown !== void 0) keydown = opts.keydown;
+    if (opts.capture !== void 0) capture = opts.capture;
+    if (typeof opts.splitKey === "string") splitKey = opts.splitKey;
+    if (opts.single === true) single = true;
+  }
+  if (typeof option === "string") scope = option;
+  if (single) unbind(key, scope);
+  for (; i5 < keys.length; i5++) {
+    const currentKey = keys[i5].split(splitKey);
+    mods = [];
+    if (currentKey.length > 1) mods = getMods(_modifier, currentKey);
+    let finalKey = currentKey[currentKey.length - 1];
+    finalKey = finalKey === "*" ? "*" : code(finalKey);
+    if (!(finalKey in _handlers)) _handlers[finalKey] = [];
+    _handlers[finalKey].push({
+      keyup,
+      keydown,
+      scope,
+      mods,
+      shortcut: keys[i5],
+      method,
+      key: keys[i5],
+      splitKey,
+      element
+    });
+  }
+  if (typeof element !== "undefined" && typeof window !== "undefined") {
+    if (!elementEventMap.has(element)) {
+      const keydownListener = (event = window.event) => dispatch(event, element);
+      const keyupListenr = (event = window.event) => {
+        dispatch(event, element);
+        clearModifier(event);
+      };
+      elementEventMap.set(element, { keydownListener, keyupListenr, capture });
+      addEvent(element, "keydown", keydownListener, capture);
+      addEvent(element, "keyup", keyupListenr, capture);
+    }
+    if (!winListendFocus) {
+      const listener = () => {
+        _downKeys = [];
+      };
+      winListendFocus = { listener, capture };
+      addEvent(window, "focus", listener, capture);
+    }
+    if (!winListendFullscreen && typeof document !== "undefined") {
+      const onFullscreenChange = () => {
+        _downKeys = [];
+        for (const k2 in _mods) _mods[k2] = false;
+        for (const k2 in _modifier) hotkeys2[k2] = false;
+      };
+      const fullscreenListener = onFullscreenChange;
+      const webkitListener = onFullscreenChange;
+      document.addEventListener("fullscreenchange", fullscreenListener);
+      document.addEventListener("webkitfullscreenchange", webkitListener);
+      winListendFullscreen = { fullscreen: fullscreenListener, webkit: webkitListener };
+    }
+  }
+};
+function trigger(shortcut, scope = "all") {
+  Object.keys(_handlers).forEach((key) => {
+    const dataList = _handlers[key].filter(
+      (item) => item.scope === scope && item.shortcut === shortcut
+    );
+    dataList.forEach((data) => {
+      if (data && data.method) {
+        data.method({}, data);
+      }
+    });
+  });
+}
+function removeKeyEvent(element) {
+  const values = Object.values(_handlers).flat();
+  const findindex = values.findIndex(({ element: el }) => el === element);
+  if (findindex < 0 && element) {
+    const { keydownListener, keyupListenr, capture } = elementEventMap.get(element) || {};
+    if (keydownListener && keyupListenr) {
+      removeEvent(element, "keyup", keyupListenr, capture);
+      removeEvent(element, "keydown", keydownListener, capture);
+      elementEventMap.delete(element);
+    }
+  }
+  if (values.length <= 0 || elementEventMap.size <= 0) {
+    const eventKeys = Array.from(elementEventMap.keys());
+    eventKeys.forEach((el) => {
+      const { keydownListener, keyupListenr, capture } = elementEventMap.get(el) || {};
+      if (keydownListener && keyupListenr) {
+        removeEvent(el, "keyup", keyupListenr, capture);
+        removeEvent(el, "keydown", keydownListener, capture);
+        elementEventMap.delete(el);
+      }
+    });
+    elementEventMap.clear();
+    Object.keys(_handlers).forEach((key) => delete _handlers[key]);
+    if (winListendFocus) {
+      const { listener, capture } = winListendFocus;
+      removeEvent(window, "focus", listener, capture);
+      winListendFocus = null;
+    }
+    if (winListendFullscreen && typeof document !== "undefined") {
+      document.removeEventListener("fullscreenchange", winListendFullscreen.fullscreen);
+      document.removeEventListener("webkitfullscreenchange", winListendFullscreen.webkit);
+      winListendFullscreen = null;
+    }
+  }
+}
+var _api = {
+  getPressedKeyString,
+  setScope,
+  getScope,
+  deleteScope,
+  getPressedKeyCodes,
+  getAllKeyCodes,
+  isPressed,
+  filter,
+  trigger,
+  unbind,
+  keyMap: _keyMap,
+  modifier: _modifier,
+  modifierMap
+};
+for (const a3 in _api) {
+  const key = a3;
+  if (Object.prototype.hasOwnProperty.call(_api, key)) {
+    hotkeys[key] = _api[key];
+  }
+}
+if (typeof window !== "undefined") {
+  const _hotkeys = window.hotkeys;
+  hotkeys.noConflict = (deep) => {
+    if (deep && window.hotkeys === hotkeys) {
+      window.hotkeys = _hotkeys;
+    }
+    return hotkeys;
+  };
+  window.hotkeys = hotkeys;
+}
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = hotkeys;
+  module.exports.default = hotkeys;
+}
+
 // src/index.ts
 var ShortyKey = class extends i4 {
   constructor() {
@@ -611,14 +1175,14 @@ var ShortyKey = class extends i4 {
 ShortyKey.styles = i`
         .shorty-key {
             padding: 2px 4px;
-    
+
             background: var(--shorty-key-background-color);
             color: var(--shorty-key-text-color);
-    
+
             border-radius: var(--shorty-key-border-radius);
             font-size: var(--shorty-key-font-size);
             text-align: center;
-            
+
             font-weight: lighter;
         }
     `;
@@ -628,10 +1192,95 @@ __decorateClass([
 ShortyKey = __decorateClass([
   t3("shorty-key")
 ], ShortyKey);
+var ShortyAction = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.name = "";
+    this.icon = "";
+    this.hotkeys = [];
+    this.selected = false;
+    this.hovered = false;
+  }
+  render() {
+    return b2`
+            <div class="shorty-action ${this.selected ? "action-selected" : ""}">
+                <div class="action-icon"></div>
+                <p class="action-name">
+                    ${this.name}
+                </p>
+                <div class="action-hotkeys">
+                    ${this.hotkeys && this.hotkeys.length > 0 ? b2`
+                                ${this.hotkeys.map((hotkey) => b2`
+                                    <shorty-key hotkey="${hotkey}"></shorty-key>
+                                `)}
+                            ` : void 0}
+                </div>
+            </div>
+        `;
+  }
+};
+ShortyAction.styles = i`
+        .shorty-action {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            padding: 0 1em;
+        }
+
+        .shorty-action:hover {
+            background-color: var(--shorty-selected-background);
+            border-left: 2px solid var(--shorty-accent-color);
+            cursor: pointer;
+        }
+
+        .action-selected {
+            background-color: var(--shorty-selected-background);
+            border-left: 2px solid var(--shorty-accent-color);
+        }
+
+        .action-icon {
+            width: 12px;
+            height: 12px;
+            background-color: var(--shorty-secondary-background-color);
+            border-radius: 50%;
+            margin-right: 1em;
+        }
+
+        .action-name {
+            flex-grow: 1;
+            color: var(--shorty-text-color);
+        }
+
+        .action-hotkeys {
+            display: flex;
+            flex-direction: row;
+            gap: 0.2em;
+        }
+    `;
+__decorateClass([
+  n4({ type: String })
+], ShortyAction.prototype, "name", 2);
+__decorateClass([
+  n4({ type: String })
+], ShortyAction.prototype, "icon", 2);
+__decorateClass([
+  n4({ type: Array })
+], ShortyAction.prototype, "hotkeys", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], ShortyAction.prototype, "selected", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], ShortyAction.prototype, "hovered", 2);
+ShortyAction = __decorateClass([
+  t3("shorty-action")
+], ShortyAction);
 var ShortyHeader = class extends i4 {
   constructor() {
     super(...arguments);
     this.breadcrumbs = ["Home", "Library", "Data", "Reports"];
+    this.placeholder = "";
   }
   render() {
     return b2`
@@ -642,7 +1291,7 @@ var ShortyHeader = class extends i4 {
                     `)}
                 </div>
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search..."></input>
+                    <input type="text" id="search-input" placeholder="${this.placeholder}"></input>
                 </div>
             </div>
         `;
@@ -653,17 +1302,17 @@ ShortyHeader.styles = i`
             display: flex;
             flex-direction: column;
             row-gap: 1.25em;
-            
+
             padding: 1.25em;
         }
-        
+
         .breadcrumb-list {
             float: left;
             display: flex;
             flex-direction: row;
             gap: 0.5em;
         }
-        
+
         .breadcrumb-list button {
             margin: 0;
             padding: 2px 4px;
@@ -671,23 +1320,23 @@ ShortyHeader.styles = i`
             background: var(--shorty-key-background-color);
             color: var(--shorty-key-text-color);
             border: none;
-            
+
             border-radius: var(--shorty-key-border-radius);
             font-size: var(--shorty-key-font-size);
             text-align: center;
         }
-        
+
         .search-container {
             float: right;
         }
-        
+
         .search-container input {
             border: none;
             background: none;
             outline: none;
-            
+
             width: 100%;
-                
+
             font-size: 1em;
             color: var(--shorty-text-color);
         }
@@ -695,6 +1344,9 @@ ShortyHeader.styles = i`
 __decorateClass([
   n4()
 ], ShortyHeader.prototype, "breadcrumbs", 2);
+__decorateClass([
+  n4({ type: String })
+], ShortyHeader.prototype, "placeholder", 2);
 ShortyHeader = __decorateClass([
   t3("shorty-header")
 ], ShortyHeader);
@@ -773,48 +1425,24 @@ ShortyFooter = __decorateClass([
 var ShortyBody = class extends i4 {
   constructor() {
     super(...arguments);
-    this.shorties = [
-      {
-        id: "1",
-        name: "Shorty 1",
-        icon: "icon-1",
-        hotkeys: ["CTRL", "+", "P"],
-        keywords: "shorty, 1",
-        section: {
-          name: "Section 1",
-          priority: 1
-        }
-      },
-      {
-        id: "2",
-        name: "Shorty 2",
-        icon: "icon-2",
-        keywords: "shorty, 2",
-        section: {
-          name: "Section 2",
-          priority: 2
-        }
-      }
-    ];
+    this.data = [];
+    this.selectedIndex = 0;
+  }
+  updated(changedProperties) {
+    console.log("updated", changedProperties);
   }
   render() {
     return b2`
             <div class="shorty-body">
-                ${this.shorties.map((shorty) => b2`
-                    <div class="shorty-action">
-                        <div class="shorty-icon"></div>
-                        <p class="shorty-name">
-                            ${shorty.name}
-                        </p>
-                        <div class="shorty-hotkeys">
-                            ${shorty.hotkeys && shorty.hotkeys.length > 0 ? b2`
-                                ${shorty.hotkeys.map((hotkey) => b2`
-                                    <shorty-key hotkey="${hotkey}"></shorty-key>
-                                `)}
-                            ` : ""}
-                        </div>
-                    </div>
-                `)}
+                ${this.data.map(
+      (shorty, index) => {
+        return b2`
+                                <shorty-action name="${shorty.name}" icon="${shorty.icon}"
+                                               .hotkeys="${shorty.hotkeys}"
+                                               .selected="${this.selectedIndex === index}"></shorty-action>
+                            `;
+      }
+    )}
             </div>
         `;
   }
@@ -826,53 +1454,72 @@ ShortyBody.styles = i`
             padding: 0.5em 0;
 
             height: var(--shorty-actions-height);
-            
+
             border-top: 1px solid rgb(239, 241, 244);
             border-bottom: 1px solid rgb(239, 241, 244);
-        }
-        
-        .shorty-action {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            
-            padding: 0.75em 1em;
-        }
-        
-        .shorty-icon {
-            width: 12px;
-            height: 12px;
-            background-color: var(--shorty-secondary-background-color);
-            border-radius: 50%;
-            margin-right: 1em;
-        }
-        
-        .shorty-name {
-            flex-grow: 1;
-            color: var(--shorty-text-color);
-        }
-        
-        .shorty-hotkeys {
-            display: flex;
-            flex-direction: row;
-            gap: 0.2em;
         }
     `;
 __decorateClass([
   n4()
-], ShortyBody.prototype, "shorties", 2);
+], ShortyBody.prototype, "data", 2);
+__decorateClass([
+  n4({ type: Number })
+], ShortyBody.prototype, "selectedIndex", 2);
 ShortyBody = __decorateClass([
   t3("shorty-body")
 ], ShortyBody);
 var HeyShorty = class extends i4 {
+  constructor() {
+    super(...arguments);
+    this.data = [];
+    this.placeholder = "Search...";
+    this.hotkeys = "cmd+k,ctrl+k";
+    this.navigationUpHotkey = "up";
+    this.navigationDownHotkey = "down";
+    this.closeShortyHotkey = "esc";
+    this.visible = false;
+    this.selectedIndex = 0;
+  }
+  toggle() {
+    this.visible = !this.visible;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      this.toggle();
+    });
+    hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      this.visible = false;
+    });
+    hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      if (this.selectedIndex > 0) {
+        this.selectedIndex--;
+      } else {
+        this.selectedIndex = this.data.length - 1;
+      }
+      console.log("up", this.selectedIndex);
+    });
+    hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      if (this.selectedIndex < this.data.length - 1) {
+        this.selectedIndex++;
+      } else {
+        this.selectedIndex = 0;
+      }
+      console.log("down", this.selectedIndex);
+    });
+  }
   render() {
-    return b2`
-            <div id="content">
-                <shorty-header></shorty-header>
-                <shorty-body></shorty-body>
+    return true ? b2`
+            <div id="shorty">
+                <shorty-header placeholder="${this.placeholder}"></shorty-header>
+                <shorty-body .data="${this.data}" .selectedIndex="${this.selectedIndex}"></shorty-body>
                 <shorty-footer></shorty-footer>
             </div>
-        `;
+        ` : void 0;
   }
 };
 HeyShorty.styles = i`
@@ -886,7 +1533,7 @@ HeyShorty.styles = i`
             --shorty-key-background-color: rgb(239, 241, 244);
             --shorty-key-text-color: rgb(107, 111, 118);
             --shorty-key-font-size: 0.75em;
-            
+
             --shorty-accent-color: rgb(110, 94, 210);
             --shorty-secondary-background-color: rgb(239, 241, 244);
             --shorty-secondary-text-color: rgb(107, 111, 118);
@@ -906,32 +1553,62 @@ HeyShorty.styles = i`
 
             --shorty-z-index: 99999;
         }
-        
-        #content {
+
+        #shorty {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
             top: var(--shorty-top);
-            
+
             display: flex;
             flex-direction: column;
-            
+
             min-height: 400px;
             max-width: var(--shorty-width);
             min-width: 600px; //TODO: remove this
             background-color: var(--shorty-content-background);
-            
+
             box-shadow: var(--shorty-content-shadow);
             border-radius: var(--shorty-content-border-radius);
-            
+
             z-index: var(--shorty-z-index);
         }
     `;
+__decorateClass([
+  n4({
+    type: Array,
+    hasChanged() {
+      return true;
+    }
+  })
+], HeyShorty.prototype, "data", 2);
+__decorateClass([
+  n4({ type: String })
+], HeyShorty.prototype, "placeholder", 2);
+__decorateClass([
+  n4({ type: String })
+], HeyShorty.prototype, "hotkeys", 2);
+__decorateClass([
+  n4()
+], HeyShorty.prototype, "navigationUpHotkey", 2);
+__decorateClass([
+  n4()
+], HeyShorty.prototype, "navigationDownHotkey", 2);
+__decorateClass([
+  n4()
+], HeyShorty.prototype, "closeShortyHotkey", 2);
+__decorateClass([
+  n4({ type: Boolean })
+], HeyShorty.prototype, "visible", 2);
+__decorateClass([
+  n4({ type: Number })
+], HeyShorty.prototype, "selectedIndex", 2);
 HeyShorty = __decorateClass([
   t3("hey-shorty")
 ], HeyShorty);
 export {
   HeyShorty,
+  ShortyAction,
   ShortyBody,
   ShortyFooter,
   ShortyHeader,
@@ -976,5 +1653,15 @@ lit-html/is-server.js:
    * @license
    * Copyright 2021 Google LLC
    * SPDX-License-Identifier: BSD-3-Clause
+   *)
+
+hotkeys-js/dist/hotkeys-js.js:
+  (*!
+   * hotkeys-js v4.0.2
+   * A simple micro-library for defining and dispatching keyboard shortcuts. It has no dependencies.
+   * 
+   * @author kenny wong <wowohoo@qq.com>
+   * @license MIT
+   * @homepage https://jaywcjlove.github.io/hotkeys-js
    *)
 */

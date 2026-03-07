@@ -181,6 +181,11 @@ esbuild@^0.27.3:
     "@esbuild/win32-ia32" "0.27.3"
     "@esbuild/win32-x64" "0.27.3"
 
+hotkeys-js@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/hotkeys-js/-/hotkeys-js-4.0.2.tgz#89cb3876fa872240caeef486a1e7b9872bb415fc"
+  integrity sha512-fJNEO88zWwoXEGJuvjSbunKSexaT1VbC1S9wIzMA2BfOZ5KPiQj2wTqxDeXd110/4akiAuQIsE3TSbNvGgCyQg==
+
 lit-element@^4.2.0:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/lit-element/-/lit-element-4.2.2.tgz#f74fcbfbea945eae5614ece22a674fa52ca3365b"

@@ -1,5 +1,6 @@
-import {LitElement, html, css} from 'lit';
+import {css, html, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import hotkeys from 'hotkeys-js';
 
 interface ISection {
     name: string;
@@ -14,22 +15,23 @@ interface IShorty {
     hotkeys?: string[];
     parent?: string;
     keywords?: string;
-    children?: IShorty[];
     section?: ISection;
+    children?: IShorty[];
 }
 
-@customElement('shorty-key') export class ShortyKey extends LitElement {
+@customElement('shorty-key')
+export class ShortyKey extends LitElement {
     static override styles = css`
         .shorty-key {
             padding: 2px 4px;
-    
+
             background: var(--shorty-key-background-color);
             color: var(--shorty-key-text-color);
-    
+
             border-radius: var(--shorty-key-border-radius);
             font-size: var(--shorty-key-font-size);
             text-align: center;
-            
+
             font-weight: lighter;
         }
     `
@@ -38,10 +40,86 @@ interface IShorty {
     hotkey: string = '';
 
     override render() {
-
         return html`
             <div class="shorty-key">${this.hotkey}</div>
         `;
+    }
+}
+
+@customElement('shorty-action')
+export class ShortyAction extends LitElement {
+    static override styles = css`
+        .shorty-action {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+            padding: 0 1em;
+        }
+
+        .shorty-action:hover {
+            background-color: var(--shorty-selected-background);
+            border-left: 2px solid var(--shorty-accent-color);
+            cursor: pointer;
+        }
+
+        .action-selected {
+            background-color: var(--shorty-selected-background);
+            border-left: 2px solid var(--shorty-accent-color);
+        }
+
+        .action-icon {
+            width: 12px;
+            height: 12px;
+            background-color: var(--shorty-secondary-background-color);
+            border-radius: 50%;
+            margin-right: 1em;
+        }
+
+        .action-name {
+            flex-grow: 1;
+            color: var(--shorty-text-color);
+        }
+
+        .action-hotkeys {
+            display: flex;
+            flex-direction: row;
+            gap: 0.2em;
+        }
+    `
+
+    @property({type: String})
+    name: string = '';
+
+    @property({type: String})
+    icon: string = '';
+
+    @property({type: Array})
+    hotkeys: string[] = [];
+
+    @property({type: Boolean})
+    selected: boolean = false;
+
+    @property({type: Boolean})
+    hovered: boolean = false;
+
+    override render() {
+        return html`
+            <div class="shorty-action ${this.selected ? 'action-selected' : ''}">
+                <div class="action-icon"></div>
+                <p class="action-name">
+                    ${this.name}
+                </p>
+                <div class="action-hotkeys">
+                    ${this.hotkeys && this.hotkeys.length > 0 ?
+                            html`
+                                ${this.hotkeys.map(hotkey => html`
+                                    <shorty-key hotkey="${hotkey}"></shorty-key>
+                                `)}
+                            ` : undefined}
+                </div>
+            </div>
+        `
     }
 }
 
@@ -50,22 +128,25 @@ export class ShortyHeader extends LitElement {
     @property()
     breadcrumbs: string[] = ['Home', 'Library', 'Data', 'Reports'];
 
+    @property({type: String})
+    placeholder: string = '';
+
     static override styles = css`
         .shorty-header {
             display: flex;
             flex-direction: column;
             row-gap: 1.25em;
-            
+
             padding: 1.25em;
         }
-        
+
         .breadcrumb-list {
             float: left;
             display: flex;
             flex-direction: row;
             gap: 0.5em;
         }
-        
+
         .breadcrumb-list button {
             margin: 0;
             padding: 2px 4px;
@@ -73,23 +154,23 @@ export class ShortyHeader extends LitElement {
             background: var(--shorty-key-background-color);
             color: var(--shorty-key-text-color);
             border: none;
-            
+
             border-radius: var(--shorty-key-border-radius);
             font-size: var(--shorty-key-font-size);
             text-align: center;
         }
-        
+
         .search-container {
             float: right;
         }
-        
+
         .search-container input {
             border: none;
             background: none;
             outline: none;
-            
+
             width: 100%;
-                
+
             font-size: 1em;
             color: var(--shorty-text-color);
         }
@@ -104,7 +185,7 @@ export class ShortyHeader extends LitElement {
                     `)}
                 </div>
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="Search..."></input>
+                    <input type="text" id="search-input" placeholder="${this.placeholder}"></input>
                 </div>
             </div>
         `;
@@ -185,31 +266,6 @@ export class ShortyFooter extends LitElement {
 
 @customElement('shorty-body')
 export class ShortyBody extends LitElement {
-    @property()
-    shorties: IShorty[] = [
-        {
-            id: '1',
-            name: 'Shorty 1',
-            icon: 'icon-1',
-            hotkeys: ['CTRL', '+', 'P'],
-            keywords: 'shorty, 1',
-            section: {
-                name: 'Section 1',
-                priority: 1
-            }
-        },
-        {
-            id: '2',
-            name: 'Shorty 2',
-            icon: 'icon-2',
-            keywords: 'shorty, 2',
-            section: {
-                name: 'Section 2',
-                priority: 2
-            }
-        },
-    ]
-
     static override styles = css`
         .shorty-body {
             display: flex;
@@ -217,57 +273,32 @@ export class ShortyBody extends LitElement {
             padding: 0.5em 0;
 
             height: var(--shorty-actions-height);
-            
+
             border-top: 1px solid rgb(239, 241, 244);
             border-bottom: 1px solid rgb(239, 241, 244);
         }
-        
-        .shorty-action {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            
-            padding: 0.75em 1em;
-        }
-        
-        .shorty-icon {
-            width: 12px;
-            height: 12px;
-            background-color: var(--shorty-secondary-background-color);
-            border-radius: 50%;
-            margin-right: 1em;
-        }
-        
-        .shorty-name {
-            flex-grow: 1;
-            color: var(--shorty-text-color);
-        }
-        
-        .shorty-hotkeys {
-            display: flex;
-            flex-direction: row;
-            gap: 0.2em;
-        }
     `
+    @property()
+    data: IShorty[] = [];
+
+    @property({type: Number})
+    selectedIndex = 0;
+
+    override updated(changedProperties: Map<string | number | symbol, unknown>) {
+        console.log('updated', changedProperties);
+    }
 
     override render() {
         return html`
             <div class="shorty-body">
-                ${this.shorties.map(shorty => html`
-                    <div class="shorty-action">
-                        <div class="shorty-icon"></div>
-                        <p class="shorty-name">
-                            ${shorty.name}
-                        </p>
-                        <div class="shorty-hotkeys">
-                            ${shorty.hotkeys && shorty.hotkeys.length > 0 ? html`
-                                ${shorty.hotkeys.map(hotkey => html`
-                                    <shorty-key hotkey="${hotkey}"></shorty-key>
-                                `)}
-                            `: ''}
-                        </div>
-                    </div>
-                `)}
+                ${this.data.map((shorty, index) => {
+                            return html`
+                                <shorty-action name="${shorty.name}" icon="${shorty.icon}"
+                                               .hotkeys="${shorty.hotkeys}"
+                                               .selected="${this.selectedIndex === index}"></shorty-action>
+                            `
+                        }
+                )}
             </div>
         `;
     }
@@ -286,7 +317,7 @@ export class HeyShorty extends LitElement {
             --shorty-key-background-color: rgb(239, 241, 244);
             --shorty-key-text-color: rgb(107, 111, 118);
             --shorty-key-font-size: 0.75em;
-            
+
             --shorty-accent-color: rgb(110, 94, 210);
             --shorty-secondary-background-color: rgb(239, 241, 244);
             --shorty-secondary-text-color: rgb(107, 111, 118);
@@ -306,36 +337,111 @@ export class HeyShorty extends LitElement {
 
             --shorty-z-index: 99999;
         }
-        
-        #content {
+
+        #shorty {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
             top: var(--shorty-top);
-            
+
             display: flex;
             flex-direction: column;
-            
+
             min-height: 400px;
             max-width: var(--shorty-width);
             min-width: 600px; //TODO: remove this
             background-color: var(--shorty-content-background);
-            
+
             box-shadow: var(--shorty-content-shadow);
             border-radius: var(--shorty-content-border-radius);
-            
+
             z-index: var(--shorty-z-index);
         }
     `
 
+    @property({
+        type: Array,
+        hasChanged() {
+            // DOCS TAKEN FROM <Ninja-Keys>
+            // Forced to trigger changed event always.
+            // Because of a lot of framework pattern wrap object with an Observer, like vue2.
+            // That's why object passed to web component always same and no render triggered. Issue #9
+            return true;
+        },
+    })
+    data = [] as Array<IShorty>;
+
+    @property({type: String})
+    placeholder = 'Search...';
+
+    @property({type: String})
+    hotkeys = 'cmd+k,ctrl+k';
+
+    @property()
+    navigationUpHotkey = 'up';
+
+    @property()
+    navigationDownHotkey = 'down';
+
+    @property()
+    closeShortyHotkey = 'esc';
+
+    @property({type: Boolean})
+    visible = false;
+
+    @property({type: Number})
+    selectedIndex = 0;
+
+    toggle() {
+        this.visible = !this.visible;
+    }
+
+    override connectedCallback() {
+        super.connectedCallback();
+
+        hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
+            keyboardEvent.preventDefault();
+            this.toggle();
+        });
+
+        hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
+            keyboardEvent.preventDefault();
+            this.visible = false;
+        });
+
+        hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
+            keyboardEvent.preventDefault();
+
+            if (this.selectedIndex > 0) {
+                this.selectedIndex--;
+            } else {
+                this.selectedIndex = this.data.length - 1;
+            }
+            
+            console.log('up', this.selectedIndex);
+        });
+
+        hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
+            keyboardEvent.preventDefault();
+
+            if (this.selectedIndex < this.data.length - 1) {
+                this.selectedIndex++;
+            } else {
+                this.selectedIndex = 0;
+            }
+
+            console.log('down', this.selectedIndex);
+        });
+    }
+
     override render() {
-        return html`
-            <div id="content">
-                <shorty-header></shorty-header>
-                <shorty-body></shorty-body>
+        return true ? html`
+            <div id="shorty">
+                <shorty-header placeholder="${this.placeholder}"></shorty-header>
+                <shorty-body .data="${this.data}" .selectedIndex="${this.selectedIndex}"></shorty-body>
                 <shorty-footer></shorty-footer>
             </div>
-        `;
+        ` : undefined;
     }
 }
 

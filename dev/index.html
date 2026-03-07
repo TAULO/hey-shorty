@@ -3,33 +3,81 @@
 <html class="dark">
 
 <head>
-  <meta charset='utf-8'>
-  <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
-  <title>&lt;ninja-keys> Demo</title>
-  <script src="../node_modules/lit/polyfill-support.js"></script>
-  <script type="module" src="../dist/index.js"></script>
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter:300,400,500" as="style" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+    <title>&lt;ninja-keys> Demo</title>
+    <script src="../node_modules/lit/polyfill-support.js"></script>
+    <script type="module" src="../dist/index.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter:300,400,500" as="style" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
 
-  <style>
-    html {
-      font-family: 'Inter';
-    }
+    <style>
+        html {
+            font-family: 'Inter';
+        }
 
-    p {
-      border: solid 1px blue;
-      padding: 8px;
-    }
-  </style>
+        p {
+            border: solid 1px blue;
+            padding: 8px;
+        }
+    </style>
 </head>
 
 <body>
-  <style>
-  </style>
-  <hey-shorty></hey-shorty>
-  <script>
-  </script>
+<style>
+</style>
+<hey-shorty></hey-shorty>
+
+<script lang="ts" type="module">
+    const data = [
+        {
+            id: "Home",
+            name: "Open Home",
+            hotkeys: ["cmd", "+", "h"],
+            mdIcon: "home",
+            handler: () => {
+                console.log("navigation to home");
+            },
+        },
+        {
+            id: "foo",
+            name: "Open Projects",
+            hotkeys: ["cmd", "+", "p"],
+            mdIcon: "apps",
+            handler: () => {
+                console.log("navigation to projects");
+            },
+        },
+        {
+            id: "Theme",
+            name: "Change theme...",
+            mdIcon: "desktop_windows",
+            children: [
+                {
+                    id: "Light Theme",
+                    name: "Change theme to Light",
+                    mdIcon: "light_mode",
+                    handler: () => {
+                        console.log("theme light");
+                    },
+                },
+                {
+                    id: "Dark Theme",
+                    name: "Change theme to Dark",
+                    mdIcon: "dark_mode",
+                    keywords: "lol",
+                    handler: () => {
+                        console.log("theme dark");
+                    },
+                },
+            ],
+        },
+    ];
+
+    const shorty = document.querySelector("hey-shorty");
+    shorty.data = data;
+</script>
 </body>
 
 </html>
