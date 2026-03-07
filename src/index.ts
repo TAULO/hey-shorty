@@ -1,5 +1,5 @@
 import {css, html, LitElement} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement, property, state} from 'lit/decorators.js';
 import hotkeys from 'hotkeys-js';
 
 interface ISection {
@@ -371,10 +371,10 @@ export class HeyShorty extends LitElement {
     })
     data = [] as Array<IShorty>;
 
-    @property({type: String})
+    @property()
     placeholder = 'Search...';
 
-    @property({type: String})
+    @property()
     hotkeys = 'cmd+k,ctrl+k';
 
     @property()
@@ -389,8 +389,8 @@ export class HeyShorty extends LitElement {
     @property({type: Boolean})
     visible = false;
 
-    @property({type: Number})
-    selectedIndex = 0;
+    @state()
+    private _selectedIndex = 0;
 
     toggle() {
         this.visible = !this.visible;
@@ -412,25 +412,25 @@ export class HeyShorty extends LitElement {
         hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
 
-            if (this.selectedIndex > 0) {
-                this.selectedIndex--;
+            if (this._selectedIndex > 0) {
+                this._selectedIndex--;
             } else {
-                this.selectedIndex = this.data.length - 1;
+                this._selectedIndex = this.data.length - 1;
             }
-            
-            console.log('up', this.selectedIndex);
+
+            console.log('up', this._selectedIndex);
         });
 
         hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
 
-            if (this.selectedIndex < this.data.length - 1) {
-                this.selectedIndex++;
+            if (this._selectedIndex < this.data.length - 1) {
+                this._selectedIndex++;
             } else {
-                this.selectedIndex = 0;
+                this._selectedIndex = 0;
             }
 
-            console.log('down', this.selectedIndex);
+            console.log('down', this._selectedIndex);
         });
     }
 
@@ -438,7 +438,7 @@ export class HeyShorty extends LitElement {
         return true ? html`
             <div id="shorty">
                 <shorty-header placeholder="${this.placeholder}"></shorty-header>
-                <shorty-body .data="${this.data}" .selectedIndex="${this.selectedIndex}"></shorty-body>
+                <shorty-body .data="${this.data}" .selectedIndex="${this._selectedIndex}"></shorty-body>
                 <shorty-footer></shorty-footer>
             </div>
         ` : undefined;
