@@ -75,8 +75,8 @@ export class ShortyAction extends LitElement {
 
             margin-right: 1em;
 
-            width: var(--shorty-action-icon-size);
-            height: var(--shorty-action-icon-size);
+            font-size: var(--shorty-action-icon-size);
+            
             color: var(--shorty-secondary-text-color);
         }
 
