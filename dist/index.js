@@ -1284,8 +1284,9 @@ ShortyAction = __decorateClass([
 var ShortyHeader = class extends i4 {
   constructor() {
     super(...arguments);
-    this.breadcrumbs = ["Home", "Library", "Data", "Reports"];
+    this.breadcrumbs = [];
     this.placeholder = "";
+    this.search = "";
   }
   render() {
     return b2`
@@ -1296,8 +1297,19 @@ var ShortyHeader = class extends i4 {
                     `)}
                 </div>
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="${this.placeholder}"></input>
-                </div>
+                    <input
+                            type="text"
+                            placeholder="${this.placeholder}"
+                            @input=${(e5) => {
+      this.dispatchEvent(new CustomEvent("search-changed", {
+        detail: e5.target.value,
+        bubbles: true,
+        composed: true
+      }));
+    }}
+                </
+                >
+            </div>
             </div>
         `;
   }
@@ -1347,11 +1359,14 @@ ShortyHeader.styles = i`
         }
     `;
 __decorateClass([
-  n4()
+  n4({ type: Array })
 ], ShortyHeader.prototype, "breadcrumbs", 2);
 __decorateClass([
   n4({ type: String })
 ], ShortyHeader.prototype, "placeholder", 2);
+__decorateClass([
+  n4({ type: String })
+], ShortyHeader.prototype, "search", 2);
 ShortyHeader = __decorateClass([
   t3("shorty-header")
 ], ShortyHeader);
@@ -1398,9 +1413,10 @@ ShortyFooter.styles = i`
             flex-direction: row;
             gap: 1em;
             background: var(--shorty-footer-background);
-            height: 25px;
             margin-top: auto;
-            padding: 0.5em 1em
+            padding: 0.5em 1em;
+            border-bottom-left-radius: var(--shorty-content-border-radius);
+            border-bottom-right-radius: var(--shorty-content-border-radius);
         }
 
         .shorty-footer svg {
@@ -1420,7 +1436,7 @@ ShortyFooter.styles = i`
             justify-content: center;
             gap: 0.25em;
             text-align: center;
-            font-size: 0.75em;
+            font-size: var(--shorty-key-font-size);
             color: var(--shorty-secondary-text-color);
         }
     `;
@@ -1432,9 +1448,6 @@ var ShortyBody = class extends i4 {
     super(...arguments);
     this.data = [];
     this.selectedIndex = 0;
-  }
-  updated(changedProperties) {
-    console.log("updated", changedProperties);
   }
   render() {
     return b2`
@@ -1477,16 +1490,31 @@ var HeyShorty = class extends i4 {
   constructor() {
     super(...arguments);
     this.data = [];
+    this.breadcrumbs = [];
+    this.search = "";
     this.placeholder = "Search...";
     this.hotkeys = "cmd+k,ctrl+k";
     this.navigationUpHotkey = "up";
     this.navigationDownHotkey = "down";
     this.closeShortyHotkey = "esc";
+    this.navigationBackHotkey = "backspace";
+    this.handleActionHotkey = "enter";
     this.visible = false;
     this._selectedIndex = 0;
+    this._parentStack = [];
   }
   toggle() {
     this.visible = !this.visible;
+  }
+  updated(changedProperties) {
+    if (changedProperties.has("visible")) {
+      if (!this.visible) {
+        this._selectedIndex = 0;
+      }
+    }
+    if (changedProperties.has("data") && this.breadcrumbs.length === 0 && this.data[0]) {
+      this.breadcrumbs = [this.data[0].id];
+    }
   }
   connectedCallback() {
     super.connectedCallback();
@@ -1505,7 +1533,6 @@ var HeyShorty = class extends i4 {
       } else {
         this._selectedIndex = this.data.length - 1;
       }
-      console.log("up", this._selectedIndex);
     });
     hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
@@ -1514,14 +1541,39 @@ var HeyShorty = class extends i4 {
       } else {
         this._selectedIndex = 0;
       }
-      console.log("down", this._selectedIndex);
+    });
+    hotkeys(this.navigationBackHotkey, (keyboardEvent, hotkeysEvent) => {
+      if (this.search) return;
+      const parent = this._parentStack.pop();
+      if (parent) {
+        this.data = parent;
+        this.breadcrumbs = this.breadcrumbs.slice(0, -1);
+        this._selectedIndex = 0;
+      }
+    });
+    hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      const selectedAction = this.data[this._selectedIndex];
+      if (selectedAction?.children?.length) {
+        this._parentStack.push(this.data);
+        this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
+        this.data = selectedAction.children;
+        this._selectedIndex = 0;
+      } else {
+        if (selectedAction?.handler) {
+          selectedAction.handler();
+        }
+      }
     });
   }
   render() {
     return true ? b2`
-            <div id="shorty">
-                <shorty-header placeholder="${this.placeholder}"></shorty-header>
-                <shorty-body .data="${this.data}" .selectedIndex="${this._selectedIndex}"></shorty-body>
+            <div class="shorty">
+                <shorty-header placeholder=${this.placeholder} .breadcrumbs=${this.breadcrumbs}
+                               @search-changed=${(e5) => {
+      this.search = e5.detail;
+    }}></shorty-header>
+                <shorty-body .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-body>
                 <shorty-footer></shorty-footer>
             </div>
         ` : void 0;
@@ -1537,7 +1589,7 @@ HeyShorty.styles = i`
             --shorty-key-border-radius: 0.25em;
             --shorty-key-background-color: rgb(239, 241, 244);
             --shorty-key-text-color: rgb(107, 111, 118);
-            --shorty-key-font-size: 0.75em;
+            --shorty-key-font-size: 0.85em;
 
             --shorty-accent-color: rgb(110, 94, 210);
             --shorty-secondary-background-color: rgb(239, 241, 244);
@@ -1559,7 +1611,7 @@ HeyShorty.styles = i`
             --shorty-z-index: 99999;
         }
 
-        #shorty {
+        .shorty {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
@@ -1570,7 +1622,7 @@ HeyShorty.styles = i`
 
             min-height: 400px;
             max-width: var(--shorty-width);
-            min-width: 600px; //TODO: remove this
+            width: 600px; //TODO: remove this
             background-color: var(--shorty-content-background);
 
             box-shadow: var(--shorty-content-shadow);
@@ -1588,6 +1640,12 @@ __decorateClass([
   })
 ], HeyShorty.prototype, "data", 2);
 __decorateClass([
+  n4({ type: Array })
+], HeyShorty.prototype, "breadcrumbs", 2);
+__decorateClass([
+  r5()
+], HeyShorty.prototype, "search", 2);
+__decorateClass([
   n4()
 ], HeyShorty.prototype, "placeholder", 2);
 __decorateClass([
@@ -1602,6 +1660,12 @@ __decorateClass([
 __decorateClass([
   n4()
 ], HeyShorty.prototype, "closeShortyHotkey", 2);
+__decorateClass([
+  n4()
+], HeyShorty.prototype, "navigationBackHotkey", 2);
+__decorateClass([
+  n4()
+], HeyShorty.prototype, "handleActionHotkey", 2);
 __decorateClass([
   n4({ type: Boolean })
 ], HeyShorty.prototype, "visible", 2);

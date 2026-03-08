@@ -5,7 +5,7 @@
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
-    <title>&lt;ninja-keys> Demo</title>
+    <title></title>
     <script src="../node_modules/lit/polyfill-support.js"></script>
     <script type="module" src="../dist/index.js"></script>
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
@@ -61,6 +61,28 @@
                     handler: () => {
                         console.log("theme light");
                     },
+                    children: [
+                        {
+                            id: "Dark Theme",
+                            name: "Change theme to Dark",
+                            mdIcon: "dark_mode",
+                            keywords: "lol",
+                            handler: () => {
+                                console.log("theme dark");
+                            },
+                            children: [
+                                {
+                                    id: "Dark Theme",
+                                    name: "Change theme to Dark",
+                                    mdIcon: "dark_mode",
+                                    keywords: "lol",
+                                    handler: () => {
+                                        console.log("theme dark");
+                                    },
+                                },
+                            ]
+                        },
+                    ]
                 },
                 {
                     id: "Dark Theme",
@@ -70,6 +92,17 @@
                     handler: () => {
                         console.log("theme dark");
                     },
+                    children: [
+                        {
+                            id: "Dark Theme",
+                            name: "Change theme to Dark",
+                            mdIcon: "dark_mode",
+                            keywords: "lol",
+                            handler: () => {
+                                console.log("theme dark");
+                            },
+                        },
+                    ]
                 },
             ],
         },

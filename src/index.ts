@@ -125,11 +125,14 @@ export class ShortyAction extends LitElement {
 
 @customElement('shorty-header')
 export class ShortyHeader extends LitElement {
-    @property()
-    breadcrumbs: string[] = ['Home', 'Library', 'Data', 'Reports'];
+    @property({type: Array})
+    breadcrumbs: string[] = [];
 
     @property({type: String})
     placeholder: string = '';
+
+    @property({type: String})
+    search = '';
 
     static override styles = css`
         .shorty-header {
@@ -185,8 +188,19 @@ export class ShortyHeader extends LitElement {
                     `)}
                 </div>
                 <div class="search-container">
-                    <input type="text" id="search-input" placeholder="${this.placeholder}"></input>
-                </div>
+                    <input
+                            type="text"
+                            placeholder="${this.placeholder}"
+                            @input=${(e: Event) => {
+                                this.dispatchEvent(new CustomEvent('search-changed', {
+                                    detail: (e.target as HTMLInputElement).value,
+                                    bubbles: true,
+                                    composed: true,
+                                }));
+                            }}
+                </
+                >
+            </div>
             </div>
         `;
     }
@@ -200,9 +214,10 @@ export class ShortyFooter extends LitElement {
             flex-direction: row;
             gap: 1em;
             background: var(--shorty-footer-background);
-            height: 25px;
             margin-top: auto;
-            padding: 0.5em 1em
+            padding: 0.5em 1em;
+            border-bottom-left-radius: var(--shorty-content-border-radius);
+            border-bottom-right-radius: var(--shorty-content-border-radius);
         }
 
         .shorty-footer svg {
@@ -222,7 +237,7 @@ export class ShortyFooter extends LitElement {
             justify-content: center;
             gap: 0.25em;
             text-align: center;
-            font-size: 0.75em;
+            font-size: var(--shorty-key-font-size);
             color: var(--shorty-secondary-text-color);
         }
     `
@@ -284,10 +299,6 @@ export class ShortyBody extends LitElement {
     @property({type: Number})
     selectedIndex = 0;
 
-    override updated(changedProperties: Map<string | number | symbol, unknown>) {
-        console.log('updated', changedProperties);
-    }
-
     override render() {
         return html`
             <div class="shorty-body">
@@ -316,7 +327,7 @@ export class HeyShorty extends LitElement {
             --shorty-key-border-radius: 0.25em;
             --shorty-key-background-color: rgb(239, 241, 244);
             --shorty-key-text-color: rgb(107, 111, 118);
-            --shorty-key-font-size: 0.75em;
+            --shorty-key-font-size: 0.85em;
 
             --shorty-accent-color: rgb(110, 94, 210);
             --shorty-secondary-background-color: rgb(239, 241, 244);
@@ -338,7 +349,7 @@ export class HeyShorty extends LitElement {
             --shorty-z-index: 99999;
         }
 
-        #shorty {
+        .shorty {
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
@@ -349,7 +360,7 @@ export class HeyShorty extends LitElement {
 
             min-height: 400px;
             max-width: var(--shorty-width);
-            min-width: 600px; //TODO: remove this
+            width: 600px; //TODO: remove this
             background-color: var(--shorty-content-background);
 
             box-shadow: var(--shorty-content-shadow);
@@ -371,6 +382,12 @@ export class HeyShorty extends LitElement {
     })
     data = [] as Array<IShorty>;
 
+    @property({type: Array})
+    breadcrumbs: Array<string> = [];
+
+    @state()
+    search = '';
+
     @property()
     placeholder = 'Search...';
 
@@ -386,14 +403,34 @@ export class HeyShorty extends LitElement {
     @property()
     closeShortyHotkey = 'esc';
 
+    @property()
+    navigationBackHotkey = 'backspace';
+
+    @property()
+    handleActionHotkey = 'enter';
+
     @property({type: Boolean})
     visible = false;
+
+    toggle() {
+        this.visible = !this.visible;
+    }
 
     @state()
     private _selectedIndex = 0;
 
-    toggle() {
-        this.visible = !this.visible;
+    private _parentStack: Array<typeof this.data> = [];
+
+    override updated(changedProperties: Map<string | number | symbol, unknown>) {
+        if (changedProperties.has('visible')) {
+            if (!this.visible) {
+                this._selectedIndex = 0;
+            }
+        }
+
+        if (changedProperties.has('data') && this.breadcrumbs.length === 0 && this.data[0]) {
+            this.breadcrumbs = [this.data[0].id];
+        }
     }
 
     override connectedCallback() {
@@ -417,8 +454,6 @@ export class HeyShorty extends LitElement {
             } else {
                 this._selectedIndex = this.data.length - 1;
             }
-
-            console.log('up', this._selectedIndex);
         });
 
         hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
@@ -429,16 +464,44 @@ export class HeyShorty extends LitElement {
             } else {
                 this._selectedIndex = 0;
             }
+        });
 
-            console.log('down', this._selectedIndex);
+        hotkeys(this.navigationBackHotkey, (keyboardEvent, hotkeysEvent) => {
+            if (this.search) return;
+
+            const parent = this._parentStack.pop();
+            if (parent) {
+                this.data = parent;
+                this.breadcrumbs = this.breadcrumbs.slice(0, -1);
+                this._selectedIndex = 0;
+            }
+        });
+
+        hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
+            keyboardEvent.preventDefault();
+            const selectedAction = this.data[this._selectedIndex];
+
+            if (selectedAction?.children?.length) {
+                this._parentStack.push(this.data);  // save current level
+                this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
+                this.data = selectedAction.children;
+                this._selectedIndex = 0;
+            } else {
+                if (selectedAction?.handler) {
+                    selectedAction.handler();
+                }
+            }
         });
     }
 
     override render() {
         return true ? html`
-            <div id="shorty">
-                <shorty-header placeholder="${this.placeholder}"></shorty-header>
-                <shorty-body .data="${this.data}" .selectedIndex="${this._selectedIndex}"></shorty-body>
+            <div class="shorty">
+                <shorty-header placeholder=${this.placeholder} .breadcrumbs=${this.breadcrumbs}
+                               @search-changed=${(e: CustomEvent) => {
+                                   this.search = e.detail;
+                               }}></shorty-header>
+                <shorty-body .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-body>
                 <shorty-footer></shorty-footer>
             </div>
         ` : undefined;
