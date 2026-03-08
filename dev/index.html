@@ -35,7 +35,7 @@
             id: "Home",
             name: "Open Home",
             hotkeys: ["cmd", "+", "h"],
-            mdIcon: "home",
+            icon: "home",
             handler: () => {
                 console.log("navigation to home");
             },
@@ -44,7 +44,7 @@
             id: "foo",
             name: "Open Projects",
             hotkeys: ["cmd", "+", "p"],
-            mdIcon: "apps",
+            icon: "apps",
             handler: () => {
                 console.log("navigation to projects");
             },
@@ -52,12 +52,12 @@
         {
             id: "Theme",
             name: "Change theme...",
-            mdIcon: "desktop_windows",
+            icon: "desktop_windows",
             children: [
                 {
                     id: "Light Theme",
                     name: "Change theme to Light",
-                    mdIcon: "light_mode",
+                    icon: "light_mode",
                     handler: () => {
                         console.log("theme light");
                     },
@@ -65,7 +65,7 @@
                         {
                             id: "Dark Theme",
                             name: "Change theme to Dark",
-                            mdIcon: "dark_mode",
+                            icon: "dark_mode",
                             keywords: "lol",
                             handler: () => {
                                 console.log("theme dark");
@@ -74,7 +74,7 @@
                                 {
                                     id: "Dark Theme",
                                     name: "Change theme to Dark",
-                                    mdIcon: "dark_mode",
+                                    icon: "dark_mode",
                                     keywords: "lol",
                                     handler: () => {
                                         console.log("theme dark");

@@ -1,6 +1,7 @@
 import {css, html, LitElement} from 'lit';
 import {customElement, property, state} from 'lit/decorators.js';
 import hotkeys from 'hotkeys-js';
+import '@material/mwc-icon';
 
 interface ISection {
     name: string;
@@ -59,21 +60,24 @@ export class ShortyAction extends LitElement {
 
         .shorty-action:hover {
             background-color: var(--shorty-selected-background);
-            border-left: 2px solid var(--shorty-secondary-color);
+            box-shadow: inset 2px 0 0 0 var(--shorty-secondary-color);
             cursor: pointer;
         }
 
         .action-selected {
             background-color: var(--shorty-selected-background);
-            border-left: 2px solid var(--shorty-secondary-color);
+            box-shadow: inset 2px 0 0 0 var(--shorty-secondary-color);
         }
 
         .action-icon {
-            width: 12px;
-            height: 12px;
-            background-color: var(--shorty-secondary-background-color);
-            border-radius: 50%;
+            display: flex;
+            align-items: center;
+
             margin-right: 1em;
+
+            width: var(--shorty-action-icon-size);
+            height: var(--shorty-action-icon-size);
+            color: var(--shorty-secondary-text-color);
         }
 
         .action-name {
@@ -106,7 +110,7 @@ export class ShortyAction extends LitElement {
     override render() {
         return html`
             <div class="shorty-action ${this.selected ? 'action-selected' : ''}">
-                <div class="action-icon"></div>
+                <mwc-icon class="action-icon">${this.icon}</mwc-icon>
                 <p class="action-name">
                     ${this.name}
                 </p>
@@ -347,13 +351,11 @@ export class HeyShorty extends LitElement {
             --shorty-content-border-radius: 0.5em;
 
             --shorty-actions-height: 300px;
-            --shorty-group-text-color: rgb(144, 149, 157);
-
             --shorty-footer-background: rgba(242, 242, 242, 0.4);
-
             --shorty-placeholder-color: #8e8e8e;
-
             --shorty-z-index: 99999;
+            
+            --shorty-action-icon-size: 1.2em;
         }
 
         .shorty {

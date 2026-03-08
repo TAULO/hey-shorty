@@ -9,6 +9,7 @@
     "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm"
   },
   "dependencies": {
+    "@material/mwc-icon": "^0.27.0",
     "hotkeys-js": "^4.0.2",
     "lit": "^3.3.2"
   },
