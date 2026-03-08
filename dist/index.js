@@ -1235,13 +1235,13 @@ ShortyAction.styles = i`
 
         .shorty-action:hover {
             background-color: var(--shorty-selected-background);
-            border-left: 2px solid var(--shorty-accent-color);
+            border-left: 2px solid var(--shorty-secondary-color);
             cursor: pointer;
         }
 
         .action-selected {
             background-color: var(--shorty-selected-background);
-            border-left: 2px solid var(--shorty-accent-color);
+            border-left: 2px solid var(--shorty-secondary-color);
         }
 
         .action-icon {
@@ -1321,6 +1321,11 @@ ShortyHeader.styles = i`
             row-gap: 1.25em;
 
             padding: 1.25em;
+            
+            background: var(--shorty-primary-color);
+            
+            border-top-left-radius: var(--shorty-content-border-radius);
+            border-top-right-radius: var(--shorty-content-border-radius);
         }
 
         .breadcrumb-list {
@@ -1472,6 +1477,7 @@ ShortyBody.styles = i`
             padding: 0.5em 0;
 
             height: var(--shorty-actions-height);
+            background-color: var(--shorty-primary-color);
 
             border-top: 1px solid rgb(239, 241, 244);
             border-bottom: 1px solid rgb(239, 241, 244);
@@ -1591,13 +1597,14 @@ HeyShorty.styles = i`
             --shorty-key-text-color: rgb(107, 111, 118);
             --shorty-key-font-size: 0.85em;
 
-            --shorty-accent-color: rgb(110, 94, 210);
             --shorty-secondary-background-color: rgb(239, 241, 244);
             --shorty-secondary-text-color: rgb(107, 111, 118);
 
             --shorty-selected-background: rgb(248, 249, 251);
-
-            --shorty-content-background: #fff;
+            
+            --shorty-primary-color: #fff;
+            --shorty-secondary-color: rgb(110, 94, 210);
+            
             --shorty-content-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
             --shorty-content-border-radius: 0.5em;
 
@@ -1623,7 +1630,7 @@ HeyShorty.styles = i`
             min-height: 400px;
             max-width: var(--shorty-width);
             width: 600px; //TODO: remove this
-            background-color: var(--shorty-content-background);
+            background-color: var(--shorty-primary-color);
 
             box-shadow: var(--shorty-content-shadow);
             border-radius: var(--shorty-content-border-radius);
