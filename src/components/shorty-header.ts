@@ -1,27 +1,22 @@
 import {customElement, property} from "lit/decorators.js";
 import {css, html, LitElement} from "lit";
+import {createRef, ref} from 'lit/directives/ref.js';
 
 @customElement('shorty-header')
 export class ShortyHeader extends LitElement {
-    @property({type: Array})
-    breadcrumbs: string[] = [];
-
-    @property({type: String})
-    placeholder: string = '';
-
-    @property({type: String})
-    search = '';
-
     static override styles = css`
+
+        /* noinspection CssUnresolvedCustomProperty */
+
         .shorty-header {
             display: flex;
             flex-direction: column;
             row-gap: 1.25em;
 
             padding: 1.25em;
-            
+
             background: var(--shorty-primary-color);
-            
+
             border-top-left-radius: var(--shorty-content-border-radius);
             border-top-right-radius: var(--shorty-content-border-radius);
         }
@@ -32,6 +27,8 @@ export class ShortyHeader extends LitElement {
             flex-direction: row;
             gap: 0.5em;
         }
+
+        /* noinspection CssUnresolvedCustomProperty */
 
         .breadcrumb-list button {
             margin: 0;
@@ -50,6 +47,8 @@ export class ShortyHeader extends LitElement {
             float: right;
         }
 
+        /* noinspection CssUnresolvedCustomProperty */
+
         .search-container input {
             border: none;
             background: none;
@@ -61,6 +60,33 @@ export class ShortyHeader extends LitElement {
             color: var(--shorty-text-color);
         }
     `
+
+    @property({type: Array})
+    breadcrumbs: string[] = [];
+
+    @property({type: String})
+    placeholder: string = '';
+
+    public focusSearch() {
+        this._inputRef.value?.focus();
+    }
+
+    private _handleInput(event: Event) {
+        const input = event.target as HTMLInputElement;
+        this.dispatchEvent(
+            new CustomEvent('change', {
+                detail: {search: input.value},
+                bubbles: false,
+                composed: false,
+            })
+        );
+    }
+
+    private _inputRef = createRef<HTMLInputElement>();
+
+    override firstUpdated() {
+        this.focusSearch();
+    }
 
     override render() {
         return html`
@@ -74,16 +100,12 @@ export class ShortyHeader extends LitElement {
                     <input
                             type="text"
                             placeholder="${this.placeholder}"
-                            @input=${(e: Event) => {
-            this.dispatchEvent(new CustomEvent('search-changed', {
-                detail: (e.target as HTMLInputElement).value,
-                bubbles: true,
-                composed: true,
-            }));
-        }}
-                </
-                >
-            </div>
+                            spellcheck="false"
+                            autocomplete="off"
+                            @input=${this._handleInput}
+                            ${ref(this._inputRef)}
+                    />
+                </div>
             </div>
         `;
     }

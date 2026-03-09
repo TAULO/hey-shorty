@@ -26,10 +26,10 @@ export class HeyShorty extends LitElement {
             --shorty-secondary-text-color: rgb(107, 111, 118);
 
             --shorty-selected-background: rgb(248, 249, 251);
-            
+
             --shorty-primary-color: #fff;
             --shorty-secondary-color: rgb(110, 94, 210);
-            
+
             --shorty-content-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
             --shorty-content-border-radius: 0.5em;
 
@@ -37,9 +37,11 @@ export class HeyShorty extends LitElement {
             --shorty-footer-background: rgba(242, 242, 242, 0.4);
             --shorty-placeholder-color: #8e8e8e;
             --shorty-z-index: 99999;
-            
+
             --shorty-action-icon-size: 1.2em;
         }
+
+        /* noinspection CssUnresolvedCustomProperty */
 
         .shorty {
             position: fixed;
@@ -104,14 +106,24 @@ export class HeyShorty extends LitElement {
     @property({type: Boolean})
     visible = false;
 
-    toggle() {
-        this.visible = !this.visible;
-    }
-
     @state()
     private _selectedIndex = 0;
 
     private _parentStack: Array<typeof this.data> = [];
+
+    private _toggle() {
+        this.visible = !this.visible;
+    }
+
+    private _handleInputSearch(e: Event) {
+        this.search = (e.target as HTMLInputElement).value;
+        console.log('search', this.search);
+        this.dispatchEvent(new CustomEvent('search-changed', {
+            detail: this.search,
+            bubbles: true,
+            composed: true,
+        }));
+    }
 
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
@@ -123,6 +135,8 @@ export class HeyShorty extends LitElement {
         if (changedProperties.has('data') && this.breadcrumbs.length === 0 && this.data[0]) {
             this.breadcrumbs = [this.data[0].id];
         }
+
+        console.log('search', this.search);
     }
 
     override connectedCallback() {
@@ -130,7 +144,7 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            this.toggle();
+            this._toggle();
         });
 
         hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
@@ -187,16 +201,17 @@ export class HeyShorty extends LitElement {
     }
 
     override render() {
-        return true ? html`
+        return html`
             <div class="shorty">
-                <shorty-header placeholder=${this.placeholder} .breadcrumbs=${this.breadcrumbs}
-                               @search-changed=${(e: CustomEvent) => {
-                                   this.search = e.detail;
-                               }}></shorty-header>
+                <shorty-header
+                        placeholder=${this.placeholder}
+                        .breadcrumbs=${this.breadcrumbs}
+                        @search-changed=${this._handleInputSearch}
+                ></shorty-header>
                 <shorty-content .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-content>
                 <shorty-footer></shorty-footer>
             </div>
-        ` : undefined;
+        `;
     }
 }
 
