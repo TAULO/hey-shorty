@@ -7,8 +7,9 @@ export class ShortyFooter extends LitElement {
         .shorty-footer {
             display: flex;
             flex-direction: row;
+            align-items: center;
             gap: 1em;
-            background: var(--shorty-footer-background);
+            background: color-mix(in srgb, var(--shorty-primary-color) 90%, black 1%);
             margin-top: auto;
             padding: 0.5em 1em;
             border-bottom-left-radius: var(--shorty-content-border-radius);
@@ -16,24 +17,25 @@ export class ShortyFooter extends LitElement {
         }
 
         .shorty-footer svg {
+            display: block;
             width: 1em;
             height: 1em;
-            padding: 0.06em 0.25em;
-            fill: var(--shorty-secondary-text-color);
-            background-color: var(--shorty-secondary-background-color);
+            padding: 0.15em 0.25em;
+            fill: var(--shorty-text-color);
+            background: var(--shorty-key-background-color);
             border-radius: var(--shorty-key-border-radius);
-            font-size: var(--shorty-key-font-size);
+            box-sizing: content-box;
         }
 
         .shorty-footer .help {
-            display: flex;
+            display: inline-flex;
             flex-direction: row;
             align-items: center;
-            justify-content: center;
-            gap: 0.25em;
-            text-align: center;
+            gap: 0.35em;
             font-size: var(--shorty-key-font-size);
-            color: var(--shorty-secondary-text-color);
+            color: var(--shorty-text-color);
+            white-space: nowrap;
+            line-height: 1;
         }
     `
 

@@ -35,7 +35,7 @@ export class ShortyHeader extends LitElement {
             padding: 2px 4px;
 
             background: var(--shorty-key-background-color);
-            color: var(--shorty-key-text-color);
+            color: var(--shorty-text-color);
             border: none;
 
             border-radius: var(--shorty-key-border-radius);
@@ -74,7 +74,7 @@ export class ShortyHeader extends LitElement {
     private _handleInput(event: Event) {
         const input = event.target as HTMLInputElement;
         this.dispatchEvent(
-            new CustomEvent('change', {
+            new CustomEvent('search', {
                 detail: {search: input.value},
                 bubbles: false,
                 composed: false,

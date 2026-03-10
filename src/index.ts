@@ -11,6 +11,8 @@ import './components/shorty-footer';
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
     static override styles = css`
+        /* noinspection CssUnresolvedCustomProperty */
+
         :host {
             --shorty-width: 640px;
             --shorty-text-color: rgb(60, 65, 73);
@@ -18,8 +20,8 @@ export class HeyShorty extends LitElement {
             --shorty-top: 20%;
 
             --shorty-key-border-radius: 0.25em;
-            --shorty-key-background-color: rgb(239, 241, 244);
-            --shorty-key-text-color: rgb(107, 111, 118);
+            --shorty-key-background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
+            
             --shorty-key-font-size: 0.85em;
 
             --shorty-secondary-background-color: rgb(239, 241, 244);
@@ -28,23 +30,37 @@ export class HeyShorty extends LitElement {
             --shorty-selected-background: rgb(248, 249, 251);
 
             --shorty-primary-color: #fff;
-            --shorty-secondary-color: rgb(110, 94, 210);
+            --shorty-secondary-color: #ff6b00;
 
             --shorty-content-shadow: rgb(0 0 0 / 50%) 0px 16px 70px;
             --shorty-content-border-radius: 0.5em;
 
             --shorty-actions-height: 300px;
-            --shorty-footer-background: rgba(242, 242, 242, 0.4);
             --shorty-placeholder-color: #8e8e8e;
-            --shorty-z-index: 99999;
 
             --shorty-action-icon-size: 1.2em;
+        }
+        
+        .underlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 99999;
+        }
+        
+        .shorty-visible {
+            background-color: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(2px);
         }
 
         /* noinspection CssUnresolvedCustomProperty */
 
         .shorty {
-            position: fixed;
+            animation: pop-in 0.2s ease-in-out;
+            
+            position: relative;
             left: 50%;
             transform: translateX(-50%);
             top: var(--shorty-top);
@@ -61,6 +77,19 @@ export class HeyShorty extends LitElement {
             border-radius: var(--shorty-content-border-radius);
 
             z-index: var(--shorty-z-index);
+
+        }
+
+        @keyframes pop-in {
+            0% {
+                transform: translateX(-50%) scale(0.99);
+            }
+            50% {
+                transform: translateX(-50%) scale(1.01);
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+            }
         }
     `
 
@@ -78,9 +107,6 @@ export class HeyShorty extends LitElement {
 
     @property({type: Array})
     breadcrumbs: Array<string> = [];
-
-    @state()
-    search = '';
 
     @property()
     placeholder = 'Search...';
@@ -109,20 +135,28 @@ export class HeyShorty extends LitElement {
     @state()
     private _selectedIndex = 0;
 
+    @state()
+    private _search = '';
+
     private _parentStack: Array<typeof this.data> = [];
 
     private _toggle() {
         this.visible = !this.visible;
     }
 
-    private _handleInputSearch(e: Event) {
-        this.search = (e.target as HTMLInputElement).value;
-        console.log('search', this.search);
+    private _handleInputSearch(event: CustomEvent<{ search: string }>) {
+        this._search = event.detail.search;
         this.dispatchEvent(new CustomEvent('search-changed', {
-            detail: this.search,
+            detail: this._search,
             bubbles: true,
             composed: true,
         }));
+    }
+
+    private _handleClickedOutside(event: MouseEvent) {
+        if (this.visible && !this.contains(event.target as Node)) {
+            this.visible = false;
+        }
     }
 
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
@@ -135,8 +169,6 @@ export class HeyShorty extends LitElement {
         if (changedProperties.has('data') && this.breadcrumbs.length === 0 && this.data[0]) {
             this.breadcrumbs = [this.data[0].id];
         }
-
-        console.log('search', this.search);
     }
 
     override connectedCallback() {
@@ -173,7 +205,7 @@ export class HeyShorty extends LitElement {
         });
 
         hotkeys(this.navigationBackHotkey, (keyboardEvent, hotkeysEvent) => {
-            if (this.search) return;
+            if (this._search) return;
 
             const parent = this._parentStack.pop();
             if (parent) {
@@ -187,31 +219,48 @@ export class HeyShorty extends LitElement {
             keyboardEvent.preventDefault();
             const selectedAction = this.data[this._selectedIndex];
 
+            if (selectedAction.handler) {
+                selectedAction.handler();
+            }
+
             if (selectedAction?.children?.length) {
                 this._parentStack.push(this.data);  // save current level
                 this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
                 this.data = selectedAction.children;
                 this._selectedIndex = 0;
-            } else {
-                if (selectedAction?.handler) {
-                    selectedAction.handler();
-                }
             }
         });
     }
 
+    override disconnectedCallback() {
+        super.disconnectedCallback();
+
+        hotkeys.unbind(this.hotkeys);
+        hotkeys.unbind(this.handleActionHotkey);
+        hotkeys.unbind(this.navigationBackHotkey);
+        hotkeys.unbind(this.closeShortyHotkey);
+        hotkeys.unbind(this.navigationUpHotkey);
+        hotkeys.unbind(this.navigationDownHotkey);
+    }
+
     override render() {
-        return html`
-            <div class="shorty">
-                <shorty-header
-                        placeholder=${this.placeholder}
-                        .breadcrumbs=${this.breadcrumbs}
-                        @search-changed=${this._handleInputSearch}
-                ></shorty-header>
-                <shorty-content .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-content>
-                <shorty-footer></shorty-footer>
+        return this.visible ? html`
+            <div class="underlay ${
+                this.visible ? 'shorty-visible' : ''
+            }"
+            @click=${this._handleClickedOutside}
+            >
+                <div class="shorty">
+                    <shorty-header
+                            placeholder=${this.placeholder}
+                            .breadcrumbs=${this.breadcrumbs}
+                            @search=${this._handleInputSearch}
+                    ></shorty-header>
+                    <shorty-content .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-content>
+                    <shorty-footer></shorty-footer>
+                </div>
             </div>
-        `;
+        ` : undefined;
     }
 }
 

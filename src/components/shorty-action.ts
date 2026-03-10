@@ -9,17 +9,18 @@ export class ShortyAction extends LitElement {
             display: flex;
             flex-direction: row;
             align-items: center;
+            background-color: var(--shorty-primary-color);
 
             padding: 0 1em;
         }
 
         .shorty-action:hover {
-            background-color: var(--shorty-selected-background);
+            background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, var(--shorty-secondary-color) 4%);
             cursor: pointer;
         }
 
         .action-selected {
-            background-color: var(--shorty-selected-background);
+            background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, var(--shorty-secondary-color) 4%);
             box-shadow: inset 2px 0 0 0 var(--shorty-secondary-color);
         }
 
@@ -30,7 +31,6 @@ export class ShortyAction extends LitElement {
             margin-right: 1em;
 
             font-size: var(--shorty-action-icon-size);
-            
             color: var(--shorty-secondary-text-color);
         }
 
@@ -64,7 +64,7 @@ export class ShortyAction extends LitElement {
     override render() {
         return html`
             <div class="shorty-action ${this.selected ? 'action-selected' : ''}">
-                <mwc-icon class="action-icon">${this.icon}</mwc-icon>
+                <mwc-icon class="action-icon">${this.icon || 'question_mark'}</mwc-icon>
                 <p class="action-name">
                     ${this.name}
                 </p>
