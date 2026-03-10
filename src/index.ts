@@ -7,6 +7,7 @@ import {IShorty} from "./types/IShorty";
 import './components/shorty-header';
 import './components/shorty-content';
 import './components/shorty-footer';
+import {createRef} from "lit/directives/ref.js";
 
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
@@ -52,13 +53,13 @@ export class HeyShorty extends LitElement {
         
         .shorty-visible {
             background-color: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(2px);
         }
 
         /* noinspection CssUnresolvedCustomProperty */
 
         .shorty {
-            animation: pop-in 0.2s ease-in-out;
+            animation: pop-in 0.2s ease;
+            will-change: transform;
             
             position: relative;
             left: 50%;
@@ -159,6 +160,16 @@ export class HeyShorty extends LitElement {
         }
     }
 
+    private _reanimateContent() {
+        const shorty = this.shadowRoot?.querySelector('.shorty');
+        if (!shorty) return;
+
+        shorty.classList.remove('shorty');
+        requestAnimationFrame(() => {
+            shorty.classList.add('shorty');
+        });
+    }
+
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
             if (!this.visible) {
@@ -219,6 +230,8 @@ export class HeyShorty extends LitElement {
             keyboardEvent.preventDefault();
             const selectedAction = this.data[this._selectedIndex];
 
+            this._reanimateContent();
+
             if (selectedAction.handler) {
                 selectedAction.handler();
             }
@@ -248,7 +261,6 @@ export class HeyShorty extends LitElement {
             <div class="underlay ${
                 this.visible ? 'shorty-visible' : ''
             }"
-            @click=${this._handleClickedOutside}
             >
                 <div class="shorty">
                     <shorty-header
