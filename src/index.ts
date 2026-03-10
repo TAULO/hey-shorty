@@ -3,11 +3,9 @@ import {customElement, property, state} from 'lit/decorators.js';
 import hotkeys from 'hotkeys-js';
 import '@material/mwc-icon';
 import {IShorty} from "./types/IShorty";
-
 import './components/shorty-header';
 import './components/shorty-content';
 import './components/shorty-footer';
-import {createRef} from "lit/directives/ref.js";
 
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
