@@ -19,7 +19,7 @@ export class ShortyFooter extends LitElement {
         }
 
         .shorty-footer .key {
-            padding: 0.15em 0.25em;
+            padding: 0.2em 0.25em;
             fill: var(--shorty-text-color);
             background: var(--shorty-key-background-color);
             border-radius: var(--shorty-key-border-radius);
@@ -55,7 +55,7 @@ export class ShortyFooter extends LitElement {
     `
 
     @property()
-    action: IShorty | undefined;
+    readonly action: IShorty | undefined;
 
     private _showHints(action: IShorty) {
         const hints: Array<{ keys: string[], label: string }> = [];

@@ -19,7 +19,7 @@ export class ShortyBody extends LitElement {
 
             overflow-y: auto;
         }
-        
+
         .shorty-body .no-results {
             display: flex;
             flex-direction: row;
@@ -33,31 +33,43 @@ export class ShortyBody extends LitElement {
         }
     `
     @property({type: Array})
-    data: IShorty[] = [];
+    readonly data: IShorty[] = [];
 
     @property({type: Number})
-    selectedIndex = 0;
+    readonly selectedIndex = 0;
+
+    private _actionFocused(index: number, $event: MouseEvent) {
+        if (index !== -1 && index !== this.selectedIndex) {
+            console.log('actionFocused', index);
+            this.dispatchEvent(new CustomEvent('selected-index-changed', {
+                detail: { index },
+                bubbles: true,
+                composed: true
+            }));
+        }
+    }
 
     override render() {
         return html`
             <div class="shorty-body">
-               
                 ${
-            this.data.length === 0 ? html`
-                        <div class="no-results">
-                            <p>
-                                No results found
-                            </p>
-                        </div>
-                    ` :
-            this.data.map((shorty, index) => {
-                            return html`
-                                <shorty-action name="${shorty.name}" icon="${shorty.icon}"
-                                               .hotkeys="${shorty.hotkeys}"
-                                               .selected="${this.selectedIndex === index}"></shorty-action>
-                            `
-                        }
-                )}
+                        this.data.length === 0 ? html`
+                                    <div class="no-results">
+                                        <p>
+                                            No results found
+                                        </p>
+                                    </div>
+                                ` :
+                                this.data.map((shorty, index) => {
+                                            return html`
+                                                <shorty-action
+                                                        .shorty="${shorty}"
+                                                        .selected="${this.selectedIndex === index}"
+                                                        @mouseover=${(event: MouseEvent) => this._actionFocused(index, event)}      
+                                                "></shorty-action>
+                                            `
+                                        }
+                                )}
             </div>
         `;
     }

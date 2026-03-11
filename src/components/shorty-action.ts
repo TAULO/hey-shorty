@@ -1,6 +1,7 @@
 import {customElement, property} from "lit/decorators.js";
 import {css, html, LitElement} from "lit";
 import './shorty-key'
+import {IShorty} from "../types/IShorty";
 
 @customElement('shorty-action')
 export class ShortyAction extends LitElement {
@@ -15,7 +16,6 @@ export class ShortyAction extends LitElement {
         }
 
         .shorty-action:hover {
-            background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, var(--shorty-secondary-color) 4%);
             cursor: pointer;
         }
 
@@ -46,32 +46,37 @@ export class ShortyAction extends LitElement {
         }
     `
 
-    @property({type: String})
-    name: string = '';
-
-    @property({type: String})
-    icon: string = '';
-
-    @property({type: Array})
-    hotkeys: string[] = [];
+    @property({type: Boolean})
+    readonly selected: boolean = false;
 
     @property({type: Boolean})
-    selected: boolean = false;
+    readonly hovered: boolean = false;
 
-    @property({type: Boolean})
-    hovered: boolean = false;
+    @property({type: Object})
+    readonly shorty!: IShorty;
+
+    private _handleClick() {
+        this.dispatchEvent(new CustomEvent('action', {
+            detail: {action: this.shorty},
+            bubbles: true,
+            composed: true
+        }));
+    }
 
     override render() {
         return html`
-            <div class="shorty-action ${this.selected ? 'action-selected' : ''}">
-                <mwc-icon class="action-icon">${this.icon || 'question_mark'}</mwc-icon>
+            <div
+                    class="shorty-action ${this.selected ? 'action-selected' : ''}"
+                    @click=${this._handleClick}
+            >
+                <mwc-icon class="action-icon">${this.shorty.icon || 'question_mark'}</mwc-icon>
                 <p class="action-name">
-                    ${this.name}
+                    ${this.shorty.name}
                 </p>
                 <div class="action-hotkeys">
-                    ${this.hotkeys && this.hotkeys.length > 0 ?
+                    ${this.shorty.hotkeys && this.shorty.hotkeys.length > 0 ?
                             html`
-                                ${this.hotkeys.map(hotkey => html`
+                                ${this.shorty.hotkeys.map(hotkey => html`
                                     <shorty-key hotkey="${hotkey}"></shorty-key>
                                 `)}
                             ` : undefined}

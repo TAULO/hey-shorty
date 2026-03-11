@@ -211,6 +211,28 @@ export class HeyShorty extends LitElement {
         this._shortyHeader.value?.focusSearch();
     }
 
+    private _handleAction() {
+        this._reanimateContent();
+
+        const selectedAction = this._activeData[this._selectedIndex];
+
+        if (selectedAction.handler) {
+            selectedAction.handler();
+        }
+
+        if (selectedAction?.children?.length) {
+            this._parentStack.push(this.data);  // save current level
+            this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
+            this.data = selectedAction.children;
+        }
+
+        this._resetAfterNavigation();
+    }
+
+    private _handleSelectedIndexChanged(event: CustomEvent<{ index: number }>) {
+        this._selectedIndex = event.detail.index;
+    }
+
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
             if (!this.visible) {
@@ -306,21 +328,7 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            this._reanimateContent();
-
-            const selectedAction = this._activeData[this._selectedIndex];
-
-            if (selectedAction.handler) {
-                selectedAction.handler();
-            }
-
-            if (selectedAction?.children?.length) {
-                this._parentStack.push(this.data);  // save current level
-                this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
-                this.data = selectedAction.children;
-            }
-
-            this._resetAfterNavigation();
+            this._handleAction();
         });
     }
 
@@ -351,11 +359,16 @@ export class HeyShorty extends LitElement {
                     <shorty-header
                             ${ref(this._shortyHeader)}
                             .breadcrumbs=${this.breadcrumbs}
-                            @search=${this._handleInputSearch}
                             .search=${this._search}
                             placeholder=${this.placeholder}
+                            @search=${this._handleInputSearch}
                     ></shorty-header>
-                    <shorty-content .data=${this._activeData} .selectedIndex=${this._selectedIndex}></shorty-content>
+                    <shorty-content 
+                            .data=${this._activeData} 
+                            .selectedIndex=${this._selectedIndex}
+                            @action=${this._handleAction}
+                            @selected-index-changed=${this._handleSelectedIndexChanged}
+                    ></shorty-content>
                     <shorty-footer
                             .action=${this._currentAction}
                     ></shorty-footer>

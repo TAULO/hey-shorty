@@ -62,13 +62,13 @@ export class ShortyHeader extends LitElement {
     `
 
     @property({type: Array})
-    breadcrumbs: string[] = [];
+    readonly breadcrumbs: string[] = [];
 
     @property({type: String})
-    placeholder: string = '';
+    readonly placeholder: string = '';
 
     @property({type: String})
-    search: string = '';
+    readonly search: string = '';
 
     public focusSearch() {
         this._inputRef.value?.focus();
