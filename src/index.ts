@@ -7,6 +7,8 @@ import './components/shorty-header';
 import './components/shorty-content';
 import './components/shorty-footer';
 import Fuse from "fuse.js";
+import {createRef, ref} from "lit/directives/ref.js";
+import {ShortyHeader} from "./components/shorty-header";
 
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
@@ -79,7 +81,7 @@ export class HeyShorty extends LitElement {
 
             z-index: var(--shorty-z-index);
 
-            font-family: var(--shorty-font-family),sans-serif;
+            font-family: var(--shorty-font-family), sans-serif;
             font-size: var(--shorty-font-size);
         }
 
@@ -136,7 +138,7 @@ export class HeyShorty extends LitElement {
     visible = false;
 
     @property({type: Number})
-    maxSearchResults = 5;
+    maxSearchResults = 99;
 
     @state()
     private _selectedIndex = 0;
@@ -145,11 +147,16 @@ export class HeyShorty extends LitElement {
     private _search = '';
 
     @state()
-    _searchResults: IShorty[] = [];
+    private _searchResults: IShorty[] = [];
+
+    @state()
+    private _currentAction: IShorty | undefined;
 
     private _parentStack: Array<typeof this.data> = [];
 
     private _fuse: Fuse<IShorty> | undefined;
+
+    private _shortyHeader = createRef<ShortyHeader>();
 
     private _toggle() {
         this.visible = !this.visible;
@@ -194,10 +201,16 @@ export class HeyShorty extends LitElement {
         return flatten(this.data);
     }
 
+    private _resetAfterNavigation() {
+        this._search = '';
+        this._selectedIndex = 0;
+        this._shortyHeader.value?.focusSearch();
+    }
+
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
             if (!this.visible) {
-                this._selectedIndex = 0;
+                this._resetAfterNavigation();
             }
         }
     }
@@ -206,9 +219,11 @@ export class HeyShorty extends LitElement {
         if (changedProperties.has('data')) {
             if (this.breadcrumbs.length === 0 && this.data[0]) {
                 this.breadcrumbs = [this.data[0].id];
+                this._currentAction = this.data[0];
             }
             this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), {
                 keys: ['name'],
+                shouldSort: true,
             });
         }
 
@@ -220,11 +235,14 @@ export class HeyShorty extends LitElement {
                 this._searchResults = [];
             }
         }
+
+        if (changedProperties.has('_selectedIndex')) {
+            this._currentAction = this.data[this._selectedIndex];
+        }
     }
 
     override connectedCallback() {
         super.connectedCallback();
-
 
         hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
@@ -285,10 +303,9 @@ export class HeyShorty extends LitElement {
                 this._parentStack.push(this.data);  // save current level
                 this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
                 this.data = selectedAction.children;
-                this._selectedIndex = 0;
             }
 
-            this._search = '';
+            this._resetAfterNavigation();
         });
     }
 
@@ -306,20 +323,23 @@ export class HeyShorty extends LitElement {
     override render() {
         const dataToDisplay = this._search ? this._searchResults : this.data;
 
-        return this.visible ? html`
+        return true || this.visible ? html`
             <div class="underlay ${
                     this.visible ? 'shorty-visible' : ''
             }"
             >
                 <div class="shorty">
                     <shorty-header
+                            ${ref(this._shortyHeader)}
                             placeholder=${this.placeholder}
                             .breadcrumbs=${this.breadcrumbs}
                             @search=${this._handleInputSearch}
                             .search=${this._search}
                     ></shorty-header>
                     <shorty-content .data=${dataToDisplay} .selectedIndex=${this._selectedIndex}></shorty-content>
-                    <shorty-footer></shorty-footer>
+                    <shorty-footer
+                            .action=${this._currentAction}
+                    ></shorty-footer>
                 </div>
             </div>
         ` : undefined;
