@@ -67,6 +67,9 @@ export class ShortyHeader extends LitElement {
     @property({type: String})
     placeholder: string = '';
 
+    @property({type: String})
+    search: string = '';
+
     public focusSearch() {
         this._inputRef.value?.focus();
     }
@@ -103,6 +106,7 @@ export class ShortyHeader extends LitElement {
                             spellcheck="false"
                             autocomplete="off"
                             @input=${this._handleInput}
+                            .value=${this.search}
                             ${ref(this._inputRef)}
                     />
                 </div>

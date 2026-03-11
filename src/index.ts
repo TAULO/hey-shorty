@@ -6,6 +6,7 @@ import {IShorty} from "./types/IShorty";
 import './components/shorty-header';
 import './components/shorty-content';
 import './components/shorty-footer';
+import Fuse from "fuse.js";
 
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
@@ -16,11 +17,12 @@ export class HeyShorty extends LitElement {
             --shorty-width: 640px;
             --shorty-text-color: rgb(60, 65, 73);
             --shorty-font-size: 16px;
+            --shorty-font-family: system-ui, sans-serif;
             --shorty-top: 20%;
 
             --shorty-key-border-radius: 0.25em;
             --shorty-key-background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
-            
+
             --shorty-key-font-size: 0.85em;
 
             --shorty-secondary-background-color: rgb(239, 241, 244);
@@ -39,7 +41,7 @@ export class HeyShorty extends LitElement {
 
             --shorty-action-icon-size: 1.2em;
         }
-        
+
         .underlay {
             position: fixed;
             top: 0;
@@ -48,7 +50,7 @@ export class HeyShorty extends LitElement {
             height: 100%;
             z-index: 99999;
         }
-        
+
         .shorty-visible {
             background-color: rgba(0, 0, 0, 0.1);
         }
@@ -58,7 +60,7 @@ export class HeyShorty extends LitElement {
         .shorty {
             animation: pop-in 0.2s ease;
             will-change: transform;
-            
+
             position: relative;
             left: 50%;
             transform: translateX(-50%);
@@ -77,6 +79,8 @@ export class HeyShorty extends LitElement {
 
             z-index: var(--shorty-z-index);
 
+            font-family: var(--shorty-font-family),sans-serif;
+            font-size: var(--shorty-font-size);
         }
 
         @keyframes pop-in {
@@ -131,13 +135,21 @@ export class HeyShorty extends LitElement {
     @property({type: Boolean})
     visible = false;
 
+    @property({type: Number})
+    maxSearchResults = 5;
+
     @state()
     private _selectedIndex = 0;
 
     @state()
     private _search = '';
 
+    @state()
+    _searchResults: IShorty[] = [];
+
     private _parentStack: Array<typeof this.data> = [];
+
+    private _fuse: Fuse<IShorty> | undefined;
 
     private _toggle() {
         this.visible = !this.visible;
@@ -168,20 +180,51 @@ export class HeyShorty extends LitElement {
         });
     }
 
+    private _flattenData(): IShorty[] {
+        const flatten = (items: IShorty[]): IShorty[] => {
+            return items.reduce<IShorty[]>((acc, item) => {
+                acc.push(item);
+                if (item.children?.length) {
+                    acc.push(...flatten(item.children));
+                }
+                return acc;
+            }, []);
+        };
+
+        return flatten(this.data);
+    }
+
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
             if (!this.visible) {
                 this._selectedIndex = 0;
             }
         }
+    }
 
-        if (changedProperties.has('data') && this.breadcrumbs.length === 0 && this.data[0]) {
-            this.breadcrumbs = [this.data[0].id];
+    override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+        if (changedProperties.has('data')) {
+            if (this.breadcrumbs.length === 0 && this.data[0]) {
+                this.breadcrumbs = [this.data[0].id];
+            }
+            this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), {
+                keys: ['name'],
+            });
+        }
+
+        if (changedProperties.has('_search') || changedProperties.has('data')) {
+            if (this._search && this._fuse) {
+                const result = this._fuse.search(this._search);
+                this._searchResults = result.map(res => res.item);
+            } else {
+                this._searchResults = [];
+            }
         }
     }
 
     override connectedCallback() {
         super.connectedCallback();
+
 
         hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
@@ -195,18 +238,20 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
+            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
 
             if (this._selectedIndex > 0) {
                 this._selectedIndex--;
             } else {
-                this._selectedIndex = this.data.length - 1;
+                this._selectedIndex = data.length - 1;
             }
         });
 
         hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
+            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
 
-            if (this._selectedIndex < this.data.length - 1) {
+            if (this._selectedIndex < data.length - 1) {
                 this._selectedIndex++;
             } else {
                 this._selectedIndex = 0;
@@ -226,7 +271,9 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            const selectedAction = this.data[this._selectedIndex];
+
+            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
+            const selectedAction = data[this._selectedIndex];
 
             this._reanimateContent();
 
@@ -240,6 +287,8 @@ export class HeyShorty extends LitElement {
                 this.data = selectedAction.children;
                 this._selectedIndex = 0;
             }
+
+            this._search = '';
         });
     }
 
@@ -255,9 +304,11 @@ export class HeyShorty extends LitElement {
     }
 
     override render() {
+        const dataToDisplay = this._search ? this._searchResults : this.data;
+
         return this.visible ? html`
             <div class="underlay ${
-                this.visible ? 'shorty-visible' : ''
+                    this.visible ? 'shorty-visible' : ''
             }"
             >
                 <div class="shorty">
@@ -265,8 +316,9 @@ export class HeyShorty extends LitElement {
                             placeholder=${this.placeholder}
                             .breadcrumbs=${this.breadcrumbs}
                             @search=${this._handleInputSearch}
+                            .search=${this._search}
                     ></shorty-header>
-                    <shorty-content .data=${this.data} .selectedIndex=${this._selectedIndex}></shorty-content>
+                    <shorty-content .data=${dataToDisplay} .selectedIndex=${this._selectedIndex}></shorty-content>
                     <shorty-footer></shorty-footer>
                 </div>
             </div>
