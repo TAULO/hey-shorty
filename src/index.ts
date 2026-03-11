@@ -225,6 +225,15 @@ export class HeyShorty extends LitElement {
                 keys: ['name'],
                 shouldSort: true,
             });
+
+            this._flattenData().forEach(action => {
+                const actionHotkeys = (action.hotkeys || []).join('+');
+
+                hotkeys(actionHotkeys, (keyboardEvent, hotkeysEvent) => {
+                    keyboardEvent.preventDefault();
+                    if (action.handler) action.handler();
+                });
+            })
         }
 
         if (changedProperties.has('_search') || changedProperties.has('data')) {

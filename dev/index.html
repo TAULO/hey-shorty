@@ -39,16 +39,25 @@
         {
             id: "Home",
             name: "Open Home",
-            hotkeys: ["cmd", "+", "h"],
+            hotkeys: ["cmd", "h"],
             icon: "home",
             handler: () => {
                 console.log("navigation to home");
             },
         },
         {
+            id: "Home",
+            name: "Open bedroom",
+            hotkeys: ["cmd", "e"],
+            icon: "king_bed",
+            handler: () => {
+                console.log("navigation to bedroom");
+            },
+        },
+        {
             id: "foo",
             name: "Open Projects",
-            hotkeys: ["cmd", "+", "p"],
+            hotkeys: ["cmd", "p"],
             icon: "apps",
             handler: () => {
                 console.log("navigation to projects");
@@ -63,6 +72,7 @@
                     id: "Light Theme",
                     name: "Change theme to Light",
                     icon: "light_mode",
+                    hotkeys: ['cmd', 'l'],
                     handler: () => {
                         console.log("theme light");
                     },
@@ -72,6 +82,7 @@
                             name: "Change theme to Dark",
                             icon: "dark_mode",
                             keywords: "lol",
+                            hotkeys: ['cmd', 'd'],
                             handler: () => {
                                 console.log("theme dark");
                             },
