@@ -1,5 +1,6 @@
-import {customElement} from "lit/decorators.js";
+import {customElement, property} from "lit/decorators.js";
 import {css, html, LitElement} from "lit";
+import {IShorty} from "../types/IShorty";
 
 @customElement('shorty-footer')
 export class ShortyFooter extends LitElement {
@@ -8,6 +9,7 @@ export class ShortyFooter extends LitElement {
             display: flex;
             flex-direction: row;
             align-items: center;
+            justify-content: end;
             gap: 1em;
             background: color-mix(in srgb, var(--shorty-primary-color) 90%, black 1%);
             margin-top: auto;
@@ -39,7 +41,41 @@ export class ShortyFooter extends LitElement {
         }
     `
 
+    @property()
+    action: IShorty | undefined;
+
+    private _showHints() {
+        const hints: Array<{ keys: string[], label: string }> = [
+            {keys: ['↑', '↓'], label: 'navigate'},
+        ];
+
+        if (this._actionHasChildren()) {
+            hints.push({keys: ['↵'], label: 'open'});
+        } else {
+            hints.push({keys: ['↵'], label: 'select'});
+        }
+
+        hints.push({keys: ['esc'], label: ''});
+
+        return hints;
+    }
+
+    private _actionHasChildren(): boolean {
+        return !!this.action?.children?.length;
+    }
+
+
     override render() {
+        return this.action ? html`
+            <div class="shorty-footer">
+                ${this._showHints().map(hint => html`
+                    <span class="help">${hint.keys}</span>
+                    <span class="help">${hint.label}</span>
+                `)}
+            </div>
+        ` : html`
+            <div>??</div>`
+
         return html`
             <div class="shorty-footer">
               <span class="help">
