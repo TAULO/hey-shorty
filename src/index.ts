@@ -152,6 +152,9 @@ export class HeyShorty extends LitElement {
     @state()
     private _currentAction: IShorty | undefined;
 
+    @state()
+    private _activeData: IShorty[] = [];
+
     private _parentStack: Array<typeof this.data> = [];
 
     private _fuse: Fuse<IShorty> | undefined;
@@ -216,6 +219,12 @@ export class HeyShorty extends LitElement {
     }
 
     override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+        if (changedProperties.has('_search') || changedProperties.has('data') || changedProperties.has('_searchResults')) {
+            this._activeData = this._search && this._searchResults.length > 0
+                ? this._searchResults
+                : this.data;
+        }
+
         if (changedProperties.has('data')) {
             if (this.breadcrumbs.length === 0 && this.data[0]) {
                 this.breadcrumbs = [this.data[0].id];
@@ -245,8 +254,8 @@ export class HeyShorty extends LitElement {
             }
         }
 
-        if (changedProperties.has('_selectedIndex')) {
-            this._currentAction = this.data[this._selectedIndex];
+        if (changedProperties.has('_selectedIndex') || changedProperties.has('data')) {
+            this._currentAction = this._activeData[this._selectedIndex];
         }
     }
 
@@ -265,20 +274,17 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
-
             if (this._selectedIndex > 0) {
                 this._selectedIndex--;
             } else {
-                this._selectedIndex = data.length - 1;
+                this._selectedIndex = this._activeData.length - 1;
             }
         });
 
         hotkeys(this.navigationDownHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
 
-            if (this._selectedIndex < data.length - 1) {
+            if (this._selectedIndex < this._activeData.length - 1) {
                 this._selectedIndex++;
             } else {
                 this._selectedIndex = 0;
@@ -298,11 +304,9 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-
-            const data = this.data.length >= this._searchResults.length ? this.data : this._searchResults;
-            const selectedAction = data[this._selectedIndex];
-
             this._reanimateContent();
+
+            const selectedAction = this._activeData[this._selectedIndex];
 
             if (selectedAction.handler) {
                 selectedAction.handler();
@@ -330,8 +334,6 @@ export class HeyShorty extends LitElement {
     }
 
     override render() {
-        const dataToDisplay = this._search ? this._searchResults : this.data;
-
         return true || this.visible ? html`
             <div class="underlay ${
                     this.visible ? 'shorty-visible' : ''
@@ -345,7 +347,7 @@ export class HeyShorty extends LitElement {
                             @search=${this._handleInputSearch}
                             .search=${this._search}
                     ></shorty-header>
-                    <shorty-content .data=${dataToDisplay} .selectedIndex=${this._selectedIndex}></shorty-content>
+                    <shorty-content .data=${this._activeData} .selectedIndex=${this._selectedIndex}></shorty-content>
                     <shorty-footer
                             .action=${this._currentAction}
                     ></shorty-footer>

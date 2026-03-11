@@ -34,7 +34,46 @@
 </style>
 <hey-shorty></hey-shorty>
 
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+        <tr>
+            <th>Age</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
 <script lang="ts" type="module">
+    const tbody = document.querySelector('table tbody');
+
+    function addItemToTable(name, age) {
+        if (!tbody) return;
+
+        const row = document.createElement('tr');
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = name;
+        row.appendChild(nameCell);
+
+        const ageCell = document.createElement('td');
+        ageCell.textContent = String(age);
+        row.appendChild(ageCell);
+
+        tbody.appendChild(row);
+    }
+
+    function removeItemFromTable(name) {
+        if (!tbody) return;
+
+        const rows = tbody.querySelectorAll('tr');
+        rows[rows.length - 1]?.remove();
+    }
+
     const data = [
         {
             id: "Home",
@@ -43,6 +82,7 @@
             icon: "home",
             handler: () => {
                 console.log("navigation to home");
+                addItemToTable("John", 25);
             },
         },
         {
@@ -52,6 +92,7 @@
             icon: "king_bed",
             handler: () => {
                 console.log("navigation to bedroom");
+                removeItemFromTable("John");
             },
         },
         {
