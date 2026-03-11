@@ -7,7 +7,7 @@ export interface IShorty {
     handler?: Function;
     hotkeys?: string[];
     parent?: string;
-    keywords?: string;
+    searchKeywords?: string[];
     section?: ISection;
     children?: IShorty[];
 }
