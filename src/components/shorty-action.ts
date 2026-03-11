@@ -70,7 +70,7 @@ export class ShortyAction extends LitElement {
                 </p>
                 <div class="action-hotkeys">
                     ${this.hotkeys && this.hotkeys.length > 0 ?
-            html`
+                            html`
                                 ${this.hotkeys.map(hotkey => html`
                                     <shorty-key hotkey="${hotkey}"></shorty-key>
                                 `)}

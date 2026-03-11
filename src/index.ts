@@ -24,6 +24,7 @@ export class HeyShorty extends LitElement {
 
             --shorty-key-border-radius: 0.25em;
             --shorty-key-background-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
+            --shorty-border: 1px solid rgb(239, 241, 244);
 
             --shorty-key-font-size: 0.85em;
 
@@ -261,6 +262,7 @@ export class HeyShorty extends LitElement {
 
     override connectedCallback() {
         super.connectedCallback();
+        console.log('shorty connected');
 
         hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
@@ -324,6 +326,7 @@ export class HeyShorty extends LitElement {
 
     override disconnectedCallback() {
         super.disconnectedCallback();
+        console.log('shorty disconnected');
 
         hotkeys.unbind(this.hotkeys);
         hotkeys.unbind(this.handleActionHotkey);
@@ -331,6 +334,11 @@ export class HeyShorty extends LitElement {
         hotkeys.unbind(this.closeShortyHotkey);
         hotkeys.unbind(this.navigationUpHotkey);
         hotkeys.unbind(this.navigationDownHotkey);
+
+        this._flattenData().forEach(action => {
+            const actionHotkeys = (action.hotkeys || []).join('+');
+            hotkeys.unbind(actionHotkeys);
+        });
     }
 
     override render() {
@@ -342,10 +350,10 @@ export class HeyShorty extends LitElement {
                 <div class="shorty">
                     <shorty-header
                             ${ref(this._shortyHeader)}
-                            placeholder=${this.placeholder}
                             .breadcrumbs=${this.breadcrumbs}
                             @search=${this._handleInputSearch}
                             .search=${this._search}
+                            placeholder=${this.placeholder}
                     ></shorty-header>
                     <shorty-content .data=${this._activeData} .selectedIndex=${this._selectedIndex}></shorty-content>
                     <shorty-footer

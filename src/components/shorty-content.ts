@@ -14,10 +14,22 @@ export class ShortyBody extends LitElement {
             height: var(--shorty-actions-height);
             background-color: var(--shorty-primary-color);
 
-            border-top: 1px solid rgb(239, 241, 244);
-            border-bottom: 1px solid rgb(239, 241, 244);
+            border-top: var(--shorty-border);
+            border-bottom: var(--shorty-border);
 
             overflow-y: auto;
+        }
+        
+        .shorty-body .no-results {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shorty-body .no-results p {
+            font-size: 0.9em;
+            color: var(--shorty-secondary-text-color);
         }
     `
     @property({type: Array})
@@ -29,7 +41,16 @@ export class ShortyBody extends LitElement {
     override render() {
         return html`
             <div class="shorty-body">
-                ${this.data.map((shorty, index) => {
+               
+                ${
+            this.data.length === 0 ? html`
+                        <div class="no-results">
+                            <p>
+                                No results found
+                            </p>
+                        </div>
+                    ` :
+            this.data.map((shorty, index) => {
                             return html`
                                 <shorty-action name="${shorty.name}" icon="${shorty.icon}"
                                                .hotkeys="${shorty.hotkeys}"
