@@ -16,6 +16,8 @@ export class ShortyBody extends LitElement {
 
             border-top: 1px solid rgb(239, 241, 244);
             border-bottom: 1px solid rgb(239, 241, 244);
+            
+            overflow-y: auto;
         }
     `
     @property()
