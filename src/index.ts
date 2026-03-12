@@ -111,9 +111,6 @@ export class HeyShorty extends LitElement {
     })
     data = [] as Array<IShorty>;
 
-    @property({type: Array})
-    breadcrumbs: Array<string> = [];
-
     @property()
     placeholder = 'Search...';
 
@@ -135,11 +132,14 @@ export class HeyShorty extends LitElement {
     @property()
     handleActionHotkey = 'enter';
 
-    @property({type: Boolean})
-    visible = false;
-
     @property({type: Number})
     maxSearchResults = 99;
+
+    @property({type: Array})
+    private _breadcrumbs: Array<string> = [];
+
+    @state()
+    private _visible = false;
 
     @state()
     private _selectedIndex = 0;
@@ -163,7 +163,7 @@ export class HeyShorty extends LitElement {
     private _shortyHeader = createRef<ShortyHeader>();
 
     private _toggle() {
-        this.visible = !this.visible;
+        this._visible = !this._visible;
     }
 
     private _handleInputSearch(event: CustomEvent<{ search: string }>) {
@@ -176,8 +176,8 @@ export class HeyShorty extends LitElement {
     }
 
     private _handleClickedOutside(event: MouseEvent) {
-        if (this.visible && !this.contains(event.target as Node)) {
-            this.visible = false;
+        if (this._visible && !this.contains(event.target as Node)) {
+            this._visible = false;
         }
     }
 
@@ -222,7 +222,7 @@ export class HeyShorty extends LitElement {
 
         if (selectedAction?.children?.length) {
             this._parentStack.push(this.data);  // save current level
-            this.breadcrumbs = [...this.breadcrumbs, selectedAction.id];
+            this._breadcrumbs = [...this._breadcrumbs, selectedAction.id];
             this.data = selectedAction.children;
         }
 
@@ -233,9 +233,19 @@ export class HeyShorty extends LitElement {
         this._selectedIndex = event.detail.index;
     }
 
+    private _resetAllState() {
+        this._search = '';
+        this._selectedIndex = 0;
+        this._searchResults = [];
+        this._currentAction = undefined;
+        this._parentStack = [];
+        this._breadcrumbs = [this.data[0].id];
+        // Reset breadcrumbs to initial state if needed
+    }
+
     override updated(changedProperties: Map<string | number | symbol, unknown>) {
         if (changedProperties.has('visible')) {
-            if (!this.visible) {
+            if (!this._visible) {
                 this._resetAfterNavigation();
             }
         }
@@ -249,8 +259,8 @@ export class HeyShorty extends LitElement {
         }
 
         if (changedProperties.has('data')) {
-            if (this.breadcrumbs.length === 0 && this.data[0]) {
-                this.breadcrumbs = [this.data[0].id];
+            if (this._breadcrumbs.length === 0 && this.data[0]) {
+                this._breadcrumbs = [this.data[0].id];
                 this._currentAction = this.data[0];
             }
             this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), {
@@ -293,7 +303,7 @@ export class HeyShorty extends LitElement {
 
         hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
             keyboardEvent.preventDefault();
-            this.visible = false;
+            this._visible = false;
         });
 
         hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
@@ -321,7 +331,7 @@ export class HeyShorty extends LitElement {
             const parent = this._parentStack.pop();
             if (parent) {
                 this.data = parent;
-                this.breadcrumbs = this.breadcrumbs.slice(0, -1);
+                this._breadcrumbs = this._breadcrumbs.slice(0, -1);
                 this._selectedIndex = 0;
             }
         });
@@ -350,21 +360,21 @@ export class HeyShorty extends LitElement {
     }
 
     override render() {
-        return true || this.visible ? html`
+        return this._visible ? html`
             <div class="underlay ${
-                    this.visible ? 'shorty-visible' : ''
+                    this._visible ? 'shorty-visible' : ''
             }"
             >
                 <div class="shorty">
                     <shorty-header
                             ${ref(this._shortyHeader)}
-                            .breadcrumbs=${this.breadcrumbs}
+                            .breadcrumbs=${this._breadcrumbs}
                             .search=${this._search}
                             placeholder=${this.placeholder}
                             @search=${this._handleInputSearch}
                     ></shorty-header>
-                    <shorty-content 
-                            .data=${this._activeData} 
+                    <shorty-content
+                            .data=${this._activeData}
                             .selectedIndex=${this._selectedIndex}
                             @action=${this._handleAction}
                             @selected-index-changed=${this._handleSelectedIndexChanged}
