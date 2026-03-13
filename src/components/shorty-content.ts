@@ -50,6 +50,24 @@ export class ShortyBody extends LitElement {
     }
   }
 
+  private _scrollSelectedIntoView() {
+    const actions = this.shadowRoot?.querySelectorAll('shorty-action');
+    const action = actions?.[this.selectedIndex];
+
+    if (action) {
+      action.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  override updated(changedProperties: Map<string, unknown>) {
+    if (changedProperties.has('selectedIndex')) {
+      this._scrollSelectedIntoView();
+    }
+  }
+
   override render() {
     return html`
       <div class="shorty-body">
@@ -59,12 +77,12 @@ export class ShortyBody extends LitElement {
                 <p> No results found </p>
               </div>
             `
-          : this.data.map((shorty, index) => {
+          : this.data.map((action, index) => {
               return html`
                 <shorty-action
-                .shorty="${shorty}"
+                .action="${action}"
                 .selected="${this.selectedIndex === index}"
-                @mouseover=${(event: MouseEvent) => this._actionFocused(index, event)}      
+                @mouseover=${(event: MouseEvent) => this._actionFocused(index, event)}   
         "></shorty-action>
     `;
             })}

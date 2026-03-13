@@ -51,8 +51,17 @@ export class ShortyAction extends LitElement {
     }
 
     .action-highlight {
-      font-weight: 600;
       color: var(--shorty-secondary-color);
+    }
+
+    .action-children {
+      display: flex;
+      align-items: center;
+      gap: 0.2em;
+      margin: 0;
+      padding: 0;
+      font-size: var(--shorty-key-font-size);
+      color: var(--shorty-text-color);
     }
   `;
 
@@ -63,15 +72,15 @@ export class ShortyAction extends LitElement {
   readonly hovered: boolean = false;
 
   @property({ type: Object })
-  readonly shorty!: IShorty;
+  readonly action!: IShorty;
 
   private get _hasChildren(): boolean {
-    return !!this.shorty?.children?.length;
+    return !!this.action?.children?.length;
   }
   private _handleClick() {
     this.dispatchEvent(
       new CustomEvent('action', {
-        detail: { action: this.shorty },
+        detail: { action: this.action },
         bubbles: true,
         composed: true,
       }),
@@ -84,17 +93,27 @@ export class ShortyAction extends LitElement {
         class="shorty-action ${this.selected ? 'action-selected' : ''}"
         @click=${this._handleClick}
       >
-        <mwc-icon class="action-icon">${this.shorty.icon || 'question_mark'}</mwc-icon>
-        <p class="action-name"> ${unsafeHTML(this.shorty.name) ?? this.shorty.name} </p>
+        <mwc-icon class="action-icon">${this.action.icon || 'question_mark'}</mwc-icon>
+        <p class="action-name"> ${unsafeHTML(this.action.name) ?? this.action.name} </p>
         <div class="action-hotkeys">
-          ${this.shorty.hotkeys && this.shorty.hotkeys.length > 0
+          ${this.action.hotkeys && this.action.hotkeys.length > 0
             ? html`
-                ${this.shorty.hotkeys.map(
+                ${this.action.hotkeys.map(
                   hotkey => html` <shorty-key hotkey="${hotkey}"></shorty-key> `,
                 )}
               `
             : this._hasChildren
-              ? html`<mwc-icon>chevron_right</mwc-icon>`
+              ? html`
+                  <div class="action-children">
+                    <p
+                      >${this.action.children?.length}
+                      ${this.action.children && this.action.children.length > 1
+                        ? 'items'
+                        : 'item'}</p
+                    >
+                    <mwc-icon>chevron_right</mwc-icon>
+                  </div>
+                `
               : undefined}
         </div>
       </div>

@@ -22,6 +22,6 @@ export class ShortyKey extends LitElement {
   hotkey: string = '';
 
   override render() {
-    return html` <div class="shorty-key">${this.hotkey}</div> `;
+    return html` <kdb class="shorty-key">${this.hotkey}</kdb> `;
   }
 }

@@ -81,16 +81,16 @@ export class ShortyFooter extends LitElement {
               hint => html`
                 <div>
                   <span class="help">${hint.label}</span>
-                  <span class="key">${hint.keys}</span>
+                  <kbd class="key">${hint.keys}</kbd>
                 </div>
               `,
             )}
             <div class="line"></div>
             <div>
               <p class="help">Actions</p>
-              <div class="key">⌘</div>
-              <div class="key">⇧</div>
-              <div class="key">K</div>
+              <kdb class="key">⌘</kdb>
+              <kdb class="key">⇧</kdb>
+              <kdb class="key">K</kdb>
             </div>
           </div>
         `

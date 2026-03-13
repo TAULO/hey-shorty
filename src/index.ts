@@ -43,8 +43,6 @@ export class HeyShorty extends LitElement {
       --shorty-placeholder-color: #8e8e8e;
 
       --shorty-action-icon-size: 1.2em;
-      
-      --shory-highlight-matches-color: yellow;
     }
 
     .underlay {
@@ -136,7 +134,7 @@ export class HeyShorty extends LitElement {
 
   @property({ type: Number })
   maxSearchResults = 99;
-  
+
   @property({ type: Boolean })
   highlightMatches = true;
 
@@ -257,15 +255,13 @@ export class HeyShorty extends LitElement {
       }
 
       const fuseOptions = {
-        keys: [
-          { name: 'name', weight: 0.7 },
-          { name: 'searchKeywords', weight: 0.3 },
-        ],
+        keys: ['name'],
         shouldSort: true,
         includeMatches: true,
+        includeScore: true,
       };
 
-      this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), fuseOptions);
+      this._fuse = new Fuse(this._flattenData(), fuseOptions);
 
       this._flattenData().forEach(action => {
         const actionHotkeys = (action.hotkeys || []).join('+');
@@ -311,7 +307,9 @@ export class HeyShorty extends LitElement {
           return item;
         });
 
-        this._searchResults = this.highlightMatches ? highlightedMatches : result.map(res => res.item);
+        this._searchResults = this.highlightMatches
+          ? highlightedMatches
+          : result.map(res => res.item);
       } else {
         this._searchResults = [];
       }
@@ -411,6 +409,7 @@ export class HeyShorty extends LitElement {
   override render() {
     return true || this._visible
       ? html`
+          <p>${this._selectedIndex}</p>
           <div class="underlay ${this._visible ? 'shorty-visible' : ''}">
             <div class="shorty">
               <shorty-header
@@ -421,7 +420,7 @@ export class HeyShorty extends LitElement {
                 @search=${this._handleInputSearch}
               ></shorty-header>
               <shorty-content
-                .data=${this._activeData}
+                .data=${this._activeData.slice(0, this.maxSearchResults)}
                 .selectedIndex=${this._selectedIndex}
                 @action=${this._handleAction}
                 @selected-index-changed=${this._handleSelectedIndexChanged}
