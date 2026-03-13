@@ -216,10 +216,10 @@ export class HeyShorty extends LitElement {
     return flatten(this.data);
   }
 
-  private _resetAfterNavigation() {
+  private _resetAfterAction() {
     this._search = '';
-    this._selectedIndex = 0;
     this._shortyHeader.value?.focusSearch();
+    this._selectedIndex = 0;
   }
 
   private _handleAction() {
@@ -240,7 +240,7 @@ export class HeyShorty extends LitElement {
       this._activeData = selectedAction.children;
     }
 
-    this._resetAfterNavigation();
+    this._resetAfterAction();
   }
 
   private _handleSelectedIndexChanged(event: CustomEvent<{ index: number }>) {
@@ -394,6 +394,7 @@ export class HeyShorty extends LitElement {
 
     hotkeys(this.goToFirstResultHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
+      this._selectedIndex = 0;
     });
 
     hotkeys(this.goToLastResultHotkey, (keyboardEvent, hotkeysEvent) => {
