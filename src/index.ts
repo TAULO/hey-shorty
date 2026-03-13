@@ -187,7 +187,7 @@ export class HeyShorty extends LitElement {
   }
 
   private _handleClickedOutside(event: MouseEvent) {
-    if (this._visible && !this.contains(event.target as Node)) {
+    if ((event.target as HTMLElement)?.classList.contains('underlay')) {
       this._visible = false;
     }
   }
@@ -425,7 +425,10 @@ export class HeyShorty extends LitElement {
     return this._visible
       ? html`
           <p>${this._selectedIndex}</p>
-          <div class="underlay ${this._visible ? 'shorty-visible' : ''}">
+          <div
+            class="underlay ${this._visible ? 'shorty-visible' : ''}"
+            @click=${this._handleClickedOutside}
+          >
             <div class="shorty">
               <shorty-header
                 ${ref(this._shortyHeader)}
