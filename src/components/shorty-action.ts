@@ -2,6 +2,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { css, html, LitElement } from 'lit';
 import './shorty-key';
 import { IShorty } from '../types/IShorty';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 @customElement('shorty-action')
 export class ShortyAction extends LitElement {
@@ -48,6 +49,11 @@ export class ShortyAction extends LitElement {
       flex-direction: row;
       gap: 0.2em;
     }
+
+    .action-highlight {
+      font-weight: 600;
+      color: var(--shorty-secondary-color);
+    }
   `;
 
   @property({ type: Boolean })
@@ -79,7 +85,7 @@ export class ShortyAction extends LitElement {
         @click=${this._handleClick}
       >
         <mwc-icon class="action-icon">${this.shorty.icon || 'question_mark'}</mwc-icon>
-        <p class="action-name"> ${this.shorty.name} </p>
+        <p class="action-name"> ${unsafeHTML(this.shorty.name) ?? this.shorty.name} </p>
         <div class="action-hotkeys">
           ${this.shorty.hotkeys && this.shorty.hotkeys.length > 0
             ? html`

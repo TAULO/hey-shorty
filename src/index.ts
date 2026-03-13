@@ -43,6 +43,8 @@ export class HeyShorty extends LitElement {
       --shorty-placeholder-color: #8e8e8e;
 
       --shorty-action-icon-size: 1.2em;
+      
+      --shory-highlight-matches-color: yellow;
     }
 
     .underlay {
@@ -134,6 +136,9 @@ export class HeyShorty extends LitElement {
 
   @property({ type: Number })
   maxSearchResults = 99;
+  
+  @property({ type: Boolean })
+  highlightMatches = true;
 
   @property({ type: Array })
   private _breadcrumbs: Array<string> = [];
@@ -257,6 +262,7 @@ export class HeyShorty extends LitElement {
           { name: 'searchKeywords', weight: 0.3 },
         ],
         shouldSort: true,
+        includeMatches: true,
       };
 
       this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), fuseOptions);
@@ -276,7 +282,36 @@ export class HeyShorty extends LitElement {
     if (changedProperties.has('_search') || changedProperties.has('data')) {
       if (this._search && this._fuse) {
         const result = this._fuse.search(this._search);
-        this._searchResults = result.map(res => res.item);
+
+        const highlightedMatches = result.map(res => {
+          const item = res.item;
+          const matches = res.matches || [];
+          const nameMatch = matches.find(m => m.key === 'name');
+
+          if (nameMatch && nameMatch.indices) {
+            let highlightedName = '';
+            let lastIndex = 0;
+
+            const sortedIndices = [...nameMatch.indices].sort((a, b) => a[0] - b[0]);
+
+            for (const [start, end] of sortedIndices) {
+              highlightedName += item.name.slice(lastIndex, start);
+              highlightedName += `<span class="action-highlight action-name">${item.name.slice(start, end + 1)}</span>`;
+              lastIndex = end + 1;
+            }
+
+            highlightedName += item.name.slice(lastIndex);
+
+            return {
+              ...item,
+              name: highlightedName,
+            };
+          }
+
+          return item;
+        });
+
+        this._searchResults = this.highlightMatches ? highlightedMatches : result.map(res => res.item);
       } else {
         this._searchResults = [];
       }
