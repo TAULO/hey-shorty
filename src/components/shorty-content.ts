@@ -40,7 +40,6 @@ export class ShortyBody extends LitElement {
 
   private _actionFocused(index: number, $event: MouseEvent) {
     if (index !== -1 && index !== this.selectedIndex) {
-      console.log('actionFocused', index);
       this.dispatchEvent(
         new CustomEvent('selected-index-changed', {
           detail: { index },

@@ -59,6 +59,9 @@ export class ShortyAction extends LitElement {
   @property({ type: Object })
   readonly shorty!: IShorty;
 
+  private get _hasChildren(): boolean {
+    return !!this.shorty?.children?.length;
+  }
   private _handleClick() {
     this.dispatchEvent(
       new CustomEvent('action', {
@@ -84,7 +87,9 @@ export class ShortyAction extends LitElement {
                   hotkey => html` <shorty-key hotkey="${hotkey}"></shorty-key> `,
                 )}
               `
-            : undefined}
+            : this._hasChildren
+              ? html`<mwc-icon>chevron_right</mwc-icon>`
+              : undefined}
         </div>
       </div>
     `;

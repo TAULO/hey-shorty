@@ -1,57 +1,64 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html class="dark">
-
-<head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title></title>
     <script src="../node_modules/lit/polyfill-support.js"></script>
     <script type="module" src="../dist/index.js"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css?family=Inter:300,400,500" as="style" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Material+Icons&display=block" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css?family=Inter:300,400,500"
+      as="style"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Material+Icons&display=block"
+      rel="stylesheet"
+    />
 
     <style>
-        html {
-            font-family: 'Inter';
-        }
+      html {
+        font-family: 'Inter';
+      }
 
-        p {
-            border: solid 1px blue;
-            padding: 8px;
-        }
+      p {
+        border: solid 1px blue;
+        padding: 8px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-<style>
-    hey-shorty {
+  <body>
+    <style>
+      hey-shorty {
         /*--shorty-primary-color: #0d1117;*/
         /*--shorty-secondary-color: #ff6b00;*/
         /*--shorty-text-color: #ffffff;*/
-    }
-</style>
-<hey-shorty></hey-shorty>
+      }
+    </style>
+    <hey-shorty></hey-shorty>
 
-<div>
-    <table>
+    <div>
+      <table>
         <thead>
-        <tr>
+          <tr>
             <th>Name</th>
-        </tr>
-        <tr>
+          </tr>
+          <tr>
             <th>Age</th>
-        </tr>
+          </tr>
         </thead>
         <tbody></tbody>
-    </table>
-</div>
+      </table>
+    </div>
 
-<script lang="ts" type="module">
-    const tbody = document.querySelector('table tbody');
+    <script lang="ts" type="module">
+      const tbody = document.querySelector('table tbody');
 
-    function addItemToTable(name, age) {
+      function addItemToTable(name, age) {
         if (!tbody) return;
 
         const row = document.createElement('tr');
@@ -65,109 +72,320 @@
         row.appendChild(ageCell);
 
         tbody.appendChild(row);
-    }
+      }
 
-    function removeItemFromTable(name) {
+      function removeItemFromTable(name) {
         if (!tbody) return;
 
         const rows = tbody.querySelectorAll('tr');
         rows[rows.length - 1]?.remove();
-    }
+      }
 
-    const data = [
+      const data = [
+        // ── Navigation (flat, top-level actions) ──────────────────────
         {
-            id: "Home",
-            name: "Open Home",
-            hotkeys: ["cmd", "h"],
-            icon: "home",
-            handler: () => {
-                console.log("navigation to home");
-                addItemToTable("John", 25);
-            },
+          id: 'Home',
+          name: 'Go to Home',
+          hotkeys: ['cmd', 'h'],
+          icon: 'home',
+          searchKeywords: ['dashboard', 'start', 'main'],
+          handler: () => console.log('navigate → home'),
         },
         {
-            id: "Home",
-            name: "Open bedroom",
-            hotkeys: ["cmd", "e"],
-            icon: "king_bed",
-            handler: () => {
-                console.log("navigation to bedroom");
-                removeItemFromTable("John");
-            },
+          id: 'Projects',
+          name: 'Go to Projects',
+          hotkeys: ['cmd', 'p'],
+          icon: 'apps',
+          searchKeywords: ['workspace', 'boards'],
+          handler: () => console.log('navigate → projects'),
         },
         {
-            id: "foo",
-            name: "Open Projects",
-            hotkeys: ["cmd", "p"],
-            icon: "apps",
-            handler: () => {
-                console.log("navigation to projects");
-            },
+          id: 'Settings',
+          name: 'Go to Settings',
+          hotkeys: ['cmd', ','],
+          icon: 'settings',
+          handler: () => console.log('navigate → settings'),
         },
         {
-            id: "Theme",
-            name: "Change theme...",
-            icon: "desktop_windows",
-            children: [
+          id: 'Notifications',
+          name: 'Go to Notifications',
+          hotkeys: ['cmd', 'n'],
+          icon: 'notifications',
+          searchKeywords: ['alerts', 'inbox', 'bell'],
+          handler: () => console.log('navigate → notifications'),
+        },
+
+        // ── Theme (parent → children) ────────────────────────────────
+        {
+          id: 'Theme',
+          name: 'Change Theme…',
+          icon: 'palette',
+          searchKeywords: ['appearance', 'color', 'mode'],
+          children: [
+            {
+              id: 'theme-light',
+              name: 'Light',
+              icon: 'light_mode',
+              hotkeys: ['cmd', 'shift', 'l'],
+              handler: () => console.log('theme → light'),
+            },
+            {
+              id: 'theme-dark',
+              name: 'Dark',
+              icon: 'dark_mode',
+              hotkeys: ['cmd', 'shift', 'd'],
+              handler: () => console.log('theme → dark'),
+            },
+            {
+              id: 'theme-system',
+              name: 'System Default',
+              icon: 'desktop_windows',
+              handler: () => console.log('theme → system'),
+            },
+          ],
+        },
+
+        // ── Editor actions (flat) ────────────────────────────────────
+        {
+          id: 'editor-save',
+          name: 'Save File',
+          hotkeys: ['cmd', 's'],
+          icon: 'save',
+          handler: () => console.log('file saved'),
+        },
+        {
+          id: 'editor-save-all',
+          name: 'Save All Files',
+          hotkeys: ['cmd', 'shift', 's'],
+          icon: 'save_as',
+          handler: () => console.log('all files saved'),
+        },
+        {
+          id: 'editor-undo',
+          name: 'Undo',
+          hotkeys: ['cmd', 'z'],
+          icon: 'undo',
+          handler: () => console.log('undo'),
+        },
+        {
+          id: 'editor-redo',
+          name: 'Redo',
+          hotkeys: ['cmd', 'shift', 'z'],
+          icon: 'redo',
+          handler: () => console.log('redo'),
+        },
+
+        // ── Git (parent → children, 2 levels deep) ──────────────────
+        {
+          id: 'Git',
+          name: 'Git…',
+          icon: 'commit',
+          searchKeywords: ['source control', 'version', 'branch'],
+          children: [
+            {
+              id: 'git-commit',
+              name: 'Commit',
+              icon: 'check_circle',
+              hotkeys: ['cmd', 'shift', 'c'],
+              handler: () => console.log('git commit'),
+            },
+            {
+              id: 'git-push',
+              name: 'Push',
+              icon: 'cloud_upload',
+              handler: () => console.log('git push'),
+            },
+            {
+              id: 'git-pull',
+              name: 'Pull',
+              icon: 'cloud_download',
+              handler: () => console.log('git pull'),
+            },
+            {
+              id: 'Branches',
+              name: 'Switch Branch…',
+              icon: 'fork_right',
+              searchKeywords: ['checkout'],
+              children: [
                 {
-                    id: "Light Theme",
-                    name: "Change theme to Light",
-                    icon: "light_mode",
-                    hotkeys: ['cmd', 'l'],
-                    handler: () => {
-                        console.log("theme light");
-                    },
-                    children: [
-                        {
-                            id: "Dark Theme",
-                            name: "Change theme to Dark",
-                            icon: "dark_mode",
-                            keywords: "lol",
-                            hotkeys: ['cmd', 'd'],
-                            handler: () => {
-                                console.log("theme dark");
-                            },
-                            children: [
-                                {
-                                    id: "Dark Theme",
-                                    name: "Change theme to Dark",
-                                    icon: "dark_mode",
-                                    keywords: "lol",
-                                    handler: () => {
-                                        console.log("theme dark");
-                                    },
-                                },
-                            ]
-                        },
-                    ]
+                  id: 'git-branch-main',
+                  name: 'main',
+                  icon: 'star',
+                  handler: () => console.log('checkout → main'),
                 },
                 {
-                    id: "Dark Theme",
-                    name: "Change theme to Dark",
-                    mdIcon: "dark_mode",
-                    keywords: "lol",
-                    handler: () => {
-                        console.log("theme dark");
-                    },
-                    children: [
-                        {
-                            id: "Dark Theme",
-                            name: "Change theme to Dark",
-                            mdIcon: "dark_mode",
-                            keywords: "lol",
-                            handler: () => {
-                                console.log("theme dark");
-                            },
-                        },
-                    ]
+                  id: 'git-branch-dev',
+                  name: 'develop',
+                  icon: 'engineering',
+                  handler: () => console.log('checkout → develop'),
                 },
-            ],
+                {
+                  id: 'git-branch-feature',
+                  name: 'feature/shorty-v2',
+                  icon: 'new_releases',
+                  handler: () => console.log('checkout → feature/shorty-v2'),
+                },
+              ],
+            },
+            {
+              id: 'Stash',
+              name: 'Stash Changes',
+              icon: 'archive',
+              handler: () => console.log('git stash'),
+            },
+          ],
         },
-    ];
 
-    const shorty = document.querySelector("hey-shorty");
-    shorty.data = data;
-</script>
-</body>
+        // ── Account (parent → children) ──────────────────────────────
+        {
+          id: 'Account',
+          name: 'Account…',
+          icon: 'person',
+          children: [
+            {
+              id: 'account-profile',
+              name: 'Edit Profile',
+              icon: 'badge',
+              handler: () => console.log('edit profile'),
+            },
+            {
+              id: 'account-security',
+              name: 'Security & Privacy',
+              icon: 'shield',
+              searchKeywords: ['password', '2fa', 'mfa'],
+              handler: () => console.log('security settings'),
+            },
+            {
+              id: 'account-logout',
+              name: 'Sign Out',
+              icon: 'logout',
+              hotkeys: ['cmd', 'shift', 'q'],
+              handler: () => console.log('signed out'),
+            },
+          ],
+        },
 
+        // ── Layout (parent → children) ───────────────────────────────
+        {
+          id: 'Layout',
+          name: 'Layout…',
+          icon: 'view_quilt',
+          searchKeywords: ['panel', 'sidebar', 'view'],
+          children: [
+            {
+              id: 'layout-sidebar',
+              name: 'Toggle Sidebar',
+              icon: 'navigation',
+              hotkeys: ['cmd', 'b'],
+              handler: () => console.log('sidebar toggled'),
+            },
+            {
+              id: 'layout-terminal',
+              name: 'Toggle Terminal',
+              icon: 'terminal',
+              hotkeys: ['cmd', '`'],
+              handler: () => console.log('terminal toggled'),
+            },
+            {
+              id: 'layout-zen',
+              name: 'Zen Mode',
+              icon: 'fullscreen',
+              hotkeys: ['cmd', 'k', 'z'],
+              searchKeywords: ['focus', 'distraction free'],
+              handler: () => console.log('zen mode'),
+            },
+            {
+              id: 'Layout Editor',
+              name: 'Split Editor…',
+              icon: 'vertical_split',
+              children: [
+                {
+                  id: 'layout-split-right',
+                  name: 'Split Right',
+                  icon: 'arrow_right',
+                  handler: () => console.log('split right'),
+                },
+                {
+                  id: 'layout-split-down',
+                  name: 'Split Down',
+                  icon: 'arrow_downward',
+                  handler: () => console.log('split down'),
+                },
+              ],
+            },
+          ],
+        },
+
+        // ── Quick actions (flat) ─────────────────────────────────────
+        {
+          id: 'Actions',
+          name: 'Search in Files',
+          hotkeys: ['cmd', 'shift', 'f'],
+          icon: 'search',
+          searchKeywords: ['find', 'grep', 'query'],
+          handler: () => console.log('global search'),
+        },
+        {
+          id: 'action-command-palette',
+          name: 'Open Command Palette',
+          hotkeys: ['cmd', 'shift', 'p'],
+          icon: 'keyboard_command_key',
+          handler: () => console.log('command palette opened'),
+        },
+        {
+          id: 'action-quick-open',
+          name: 'Quick Open File',
+          hotkeys: ['cmd', 'o'],
+          icon: 'file_open',
+          searchKeywords: ['open', 'browse', 'recent'],
+          handler: () => console.log('quick open'),
+        },
+        {
+          id: 'action-copy-link',
+          name: 'Copy Link to Clipboard',
+          hotkeys: ['cmd', 'shift', 'l'],
+          icon: 'link',
+          handler: () => console.log('link copied'),
+        },
+
+        // ── Help (parent → children) ────────────────────────────────
+        {
+          id: 'Help',
+          name: 'Help…',
+          icon: 'help',
+          children: [
+            {
+              id: 'help-docs',
+              name: 'Documentation',
+              icon: 'menu_book',
+              handler: () => console.log('open docs'),
+            },
+            {
+              id: 'help-shortcuts',
+              name: 'Keyboard Shortcuts Reference',
+              icon: 'keyboard',
+              hotkeys: ['cmd', '/'],
+              handler: () => console.log('show shortcuts'),
+            },
+            {
+              id: 'help-report',
+              name: 'Report Issue',
+              icon: 'bug_report',
+              searchKeywords: ['bug', 'feedback'],
+              handler: () => console.log('report issue'),
+            },
+            {
+              id: 'help-about',
+              name: 'About Shorty',
+              icon: 'info',
+              handler: () => console.log('about dialog'),
+            },
+          ],
+        },
+      ];
+
+      const shorty = document.querySelector('hey-shorty');
+      shorty.data = data;
+    </script>
+  </body>
 </html>

@@ -242,36 +242,24 @@ export class HeyShorty extends LitElement {
     this._currentAction = undefined;
     this._parentStack = [];
     this._breadcrumbs = [this.data[0].id];
-    // Reset breadcrumbs to initial state if needed
-  }
-
-  override updated(changedProperties: Map<string | number | symbol, unknown>) {
-    if (changedProperties.has('visible')) {
-      if (!this._visible) {
-        this._resetAfterNavigation();
-      }
-    }
   }
 
   override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
-    if (
-      changedProperties.has('_search') ||
-      changedProperties.has('data') ||
-      changedProperties.has('_searchResults')
-    ) {
-      this._activeData =
-        this._search && this._searchResults.length > 0 ? this._searchResults : this.data;
-    }
-
     if (changedProperties.has('data')) {
       if (this._breadcrumbs.length === 0 && this.data[0]) {
         this._breadcrumbs = [this.data[0].id];
         this._currentAction = this.data[0];
       }
-      this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), {
-        keys: ['name'],
+
+      const fuseOptions = {
+        keys: [
+          { name: 'name', weight: 0.7 },
+          { name: 'searchKeywords', weight: 0.3 },
+        ],
         shouldSort: true,
-      });
+      };
+
+      this._fuse = new Fuse(this._flattenData().slice(0, this.maxSearchResults), fuseOptions);
 
       this._flattenData().forEach(action => {
         const actionHotkeys = (action.hotkeys || []).join('+');
@@ -283,6 +271,8 @@ export class HeyShorty extends LitElement {
       });
     }
 
+    // RACE CONDITION:
+    // Search FIRST - before determining active data
     if (changedProperties.has('_search') || changedProperties.has('data')) {
       if (this._search && this._fuse) {
         const result = this._fuse.search(this._search);
@@ -290,6 +280,24 @@ export class HeyShorty extends LitElement {
       } else {
         this._searchResults = [];
       }
+
+      this._selectedIndex = 0;
+    }
+    // THEN determine active data based on updated search results
+    if (
+      changedProperties.has('_search') ||
+      changedProperties.has('data') ||
+      changedProperties.has('_searchResults')
+    ) {
+      if (this._search && this._searchResults.length > 0) {
+        this._activeData = this._searchResults;
+      } else if (this._search && this._searchResults.length <= 0) {
+        this._activeData = [];
+      } else {
+        this._activeData = this.data;
+      }
+
+      this._selectedIndex = 0;
     }
 
     if (changedProperties.has('_selectedIndex') || changedProperties.has('data')) {
@@ -344,6 +352,7 @@ export class HeyShorty extends LitElement {
     hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
       this._handleAction();
+      this._selectedIndex = 0;
     });
   }
 
