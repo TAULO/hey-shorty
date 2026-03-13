@@ -109,7 +109,7 @@ export class HeyShorty extends LitElement {
       return true;
     },
   })
-  data = [] as Array<IShorty>;
+  readonly data = [] as Array<IShorty>;
 
   @property()
   placeholder = 'Search...';
@@ -229,12 +229,15 @@ export class HeyShorty extends LitElement {
 
     if (selectedAction.handler) {
       selectedAction.handler();
+      this._visible = false;
+      this._resetState();
+      return;
     }
 
     if (selectedAction?.children?.length) {
-      this._parentStack.push(this.data); // save current level
+      this._parentStack.push(this._activeData); // save current level
       this._breadcrumbs = [...this._breadcrumbs, selectedAction.id];
-      this.data = selectedAction.children;
+      this._activeData = selectedAction.children;
     }
 
     this._resetAfterNavigation();
@@ -244,11 +247,10 @@ export class HeyShorty extends LitElement {
     this._selectedIndex = event.detail.index;
   }
 
-  private _resetAllState() {
+  private _resetState() {
     this._search = '';
     this._selectedIndex = 0;
     this._searchResults = [];
-    this._currentAction = undefined;
     this._parentStack = [];
     this._breadcrumbs = [this.data[0].id];
   }
@@ -335,8 +337,6 @@ export class HeyShorty extends LitElement {
       } else {
         this._activeData = this.data;
       }
-
-      this._selectedIndex = 0;
     }
 
     if (changedProperties.has('_selectedIndex') || changedProperties.has('data')) {
@@ -355,6 +355,7 @@ export class HeyShorty extends LitElement {
     hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
       this._visible = false;
+      this._resetState();
     });
 
     hotkeys(this.navigationUpHotkey, (keyboardEvent, hotkeysEvent) => {
@@ -381,21 +382,18 @@ export class HeyShorty extends LitElement {
 
       const parent = this._parentStack.pop();
       if (parent) {
-        this.data = parent;
+        this._activeData = parent;
         this._breadcrumbs = this._breadcrumbs.slice(0, -1);
-        this._selectedIndex = 0;
       }
     });
 
     hotkeys(this.handleActionHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
       this._handleAction();
-      this._selectedIndex = 0;
     });
 
     hotkeys(this.goToFirstResultHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
-      this._selectedIndex = 0;
     });
 
     hotkeys(this.goToLastResultHotkey, (keyboardEvent, hotkeysEvent) => {
@@ -423,7 +421,7 @@ export class HeyShorty extends LitElement {
   }
 
   override render() {
-    return true || this._visible
+    return this._visible
       ? html`
           <p>${this._selectedIndex}</p>
           <div class="underlay ${this._visible ? 'shorty-visible' : ''}">
