@@ -132,6 +132,12 @@ export class HeyShorty extends LitElement {
   @property()
   handleActionHotkey = 'enter';
 
+  @property()
+  goToFirstResultHotkey = 'ctrl+up,cmd+up';
+
+  @property()
+  goToLastResultHotkey = 'ctrl+down,cmd+down';
+
   @property({ type: Number })
   maxSearchResults = 99;
 
@@ -340,7 +346,6 @@ export class HeyShorty extends LitElement {
 
   override connectedCallback() {
     super.connectedCallback();
-    console.log('shorty connected');
 
     hotkeys(this.hotkeys, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
@@ -387,11 +392,20 @@ export class HeyShorty extends LitElement {
       this._handleAction();
       this._selectedIndex = 0;
     });
+
+    hotkeys(this.goToFirstResultHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      this._selectedIndex = 0;
+    });
+
+    hotkeys(this.goToLastResultHotkey, (keyboardEvent, hotkeysEvent) => {
+      keyboardEvent.preventDefault();
+      this._selectedIndex = this._activeData.length - 1;
+    });
   }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
-    console.log('shorty disconnected');
 
     hotkeys.unbind(this.hotkeys);
     hotkeys.unbind(this.handleActionHotkey);
@@ -399,6 +413,8 @@ export class HeyShorty extends LitElement {
     hotkeys.unbind(this.closeShortyHotkey);
     hotkeys.unbind(this.navigationUpHotkey);
     hotkeys.unbind(this.navigationDownHotkey);
+    hotkeys.unbind(this.goToFirstResultHotkey);
+    hotkeys.unbind(this.goToLastResultHotkey);
 
     this._flattenData().forEach(action => {
       const actionHotkeys = (action.hotkeys || []).join('+');
