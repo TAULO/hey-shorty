@@ -18,22 +18,6 @@ export class ShortyFooter extends LitElement {
       border-bottom-right-radius: var(--shorty-content-border-radius);
     }
 
-    .shorty-footer .key {
-      padding: 0.2em 0.25em;
-      fill: var(--shorty-text-color);
-      background: var(--shorty-key-background-color);
-      border-radius: var(--shorty-key-border-radius);
-      font-size: var(--shorty-key-font-size);
-      box-sizing: content-box;
-      display: inline-flex;
-      flex-direction: row;
-      align-items: center;
-      color: var(--shorty-text-color);
-      white-space: nowrap;
-      line-height: 1;
-      text-align: center;
-    }
-
     .shorty-footer .help {
       display: inline-flex;
       flex-direction: row;
@@ -51,6 +35,11 @@ export class ShortyFooter extends LitElement {
       width: 1px;
       height: 0.8em;
       background: var(--shorty-secondary-text-color);
+    }
+
+    .shorty-footer shorty-key {
+      --shorty-key-size: 18px;
+      --shorty-key-font-weight: 500;
     }
   `;
 
@@ -81,16 +70,16 @@ export class ShortyFooter extends LitElement {
               hint => html`
                 <div>
                   <span class="help">${hint.label}</span>
-                  <kbd class="key">${hint.keys}</kbd>
+                  ${hint.keys.map(key => html` <shorty-key hotkey="${key}"></shorty-key> `)}
                 </div>
               `,
             )}
             <div class="line"></div>
             <div>
               <p class="help">Actions</p>
-              <kdb class="key">⌘</kdb>
-              <kdb class="key">⇧</kdb>
-              <kdb class="key">K</kdb>
+              <shorty-key hotkey="cmd"></shorty-key>
+              <shorty-key hotkey="shift"></shorty-key>
+              <shorty-key hotkey="K"></shorty-key>
             </div>
           </div>
         `
