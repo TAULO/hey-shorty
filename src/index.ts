@@ -13,8 +13,6 @@ import { ShortyHeader } from './components/shorty-header';
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
   static override styles = css`
-    /* noinspection CssUnresolvedCustomProperty */
-
     :host {
       --shorty-width: 640px;
       --shorty-text-color: rgb(60, 65, 73);
@@ -57,8 +55,6 @@ export class HeyShorty extends LitElement {
     .shorty-visible {
       background-color: rgba(0, 0, 0, 0.1);
     }
-
-    /* noinspection CssUnresolvedCustomProperty */
 
     .shorty {
       animation: pop-in 0.2s ease;
