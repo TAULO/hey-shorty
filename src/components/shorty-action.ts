@@ -105,12 +105,6 @@ export class ShortyAction extends LitElement {
             : this._hasChildren
               ? html`
                   <div class="action-children">
-                    <p
-                      >${this.action.children?.length}
-                      ${this.action.children && this.action.children.length > 1
-                        ? 'items'
-                        : 'item'}</p
-                    >
                     <mwc-icon>chevron_right</mwc-icon>
                   </div>
                 `
