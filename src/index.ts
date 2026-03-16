@@ -258,6 +258,8 @@ export class HeyShorty extends LitElement {
         this._currentAction = this.data[0];
       }
 
+      const flattenData = this._flattenData();
+
       const fuseOptions = {
         keys: ['name'],
         shouldSort: true,
@@ -265,9 +267,9 @@ export class HeyShorty extends LitElement {
         includeScore: true,
       };
 
-      this._fuse = new Fuse(this._flattenData(), fuseOptions);
+      this._fuse = new Fuse(flattenData, fuseOptions);
 
-      this._flattenData().forEach(action => {
+      flattenData.forEach(action => {
         const actionHotkeys = (action.hotkeys || []).join('+');
 
         hotkeys(actionHotkeys, (keyboardEvent, hotkeysEvent) => {

@@ -43,6 +43,10 @@ export class ShortyHeader extends LitElement {
     }
 
     .search-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: .8em;
       float: right;
     }
 
@@ -57,6 +61,11 @@ export class ShortyHeader extends LitElement {
 
       font-size: 1em;
       color: var(--shorty-text-color);
+    }
+
+    .search-container mwc-icon {
+      color: var(--shorty-secondary-text-color);
+      font-size: var(--shorty-action-icon-size);
     }
   `;
 
@@ -97,11 +106,13 @@ export class ShortyHeader extends LitElement {
           ${this.breadcrumbs.map(breadcrumb => html` <button>${breadcrumb}</button> `)}
         </div>
         <div class="search-container">
+          <mwc-icon>search</mwc-icon>
           <input
             type="text"
             placeholder="${this.placeholder}"
             spellcheck="false"
             autocomplete="off"
+            name="search"
             @input=${this._handleInput}
             .value=${this.search}
             ${ref(this._inputRef)}
