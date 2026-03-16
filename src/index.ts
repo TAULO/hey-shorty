@@ -156,12 +156,13 @@ export class HeyShorty extends LitElement {
   private _searchResults: IShorty[] = [];
 
   @state()
-  private _currentAction: IShorty | undefined;
-
-  @state()
   private _activeData: IShorty[] = [];
 
   private _parentStack: Array<typeof this.data> = [];
+
+  private _currentLevelData: IShorty[] = [];
+
+  private _currentAction: IShorty | undefined;
 
   private _fuse: Fuse<IShorty> | undefined;
 
@@ -216,6 +217,7 @@ export class HeyShorty extends LitElement {
     this._search = '';
     this._shortyHeader.value?.focusSearch();
     this._selectedIndex = 0;
+    this._searchResults = [];
   }
 
   private _handleAction() {
@@ -231,8 +233,9 @@ export class HeyShorty extends LitElement {
     }
 
     if (selectedAction?.children?.length) {
-      this._parentStack.push(this._activeData); // save current level
+      this._parentStack.push(this._currentLevelData); // save current level
       this._breadcrumbs = [...this._breadcrumbs, selectedAction.id];
+      this._currentLevelData = selectedAction.children;
       this._activeData = selectedAction.children;
     }
 
@@ -257,6 +260,9 @@ export class HeyShorty extends LitElement {
         this._breadcrumbs = [this.data[0].id];
         this._currentAction = this.data[0];
       }
+
+      // Initialize current level data
+      this._currentLevelData = this.data;
 
       const flattenData = this._flattenData();
 
@@ -318,21 +324,19 @@ export class HeyShorty extends LitElement {
           : result.map(res => res.item);
       } else {
         this._searchResults = [];
+        this._activeData = this._currentLevelData;
       }
 
       this._selectedIndex = 0;
     }
+
     // THEN determine active data based on updated search results
-    if (
-      changedProperties.has('_search') ||
-      changedProperties.has('data') ||
-      changedProperties.has('_searchResults')
-    ) {
+    if (changedProperties.has('data') || changedProperties.has('_searchResults')) {
       if (this._search && this._searchResults.length > 0) {
         this._activeData = this._searchResults;
       } else if (this._search && this._searchResults.length <= 0) {
         this._activeData = [];
-      } else {
+      } else if (this._parentStack.length === 0) {
         this._activeData = this.data;
       }
     }
@@ -380,6 +384,7 @@ export class HeyShorty extends LitElement {
 
       const parent = this._parentStack.pop();
       if (parent) {
+        this._currentLevelData = parent;
         this._activeData = parent;
         this._breadcrumbs = this._breadcrumbs.slice(0, -1);
       }
