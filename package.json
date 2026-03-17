@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --watch",
-    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm"
+    "build": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm && tsc --emitDeclarationOnly"
   },
-  "types": "./src/types/index.d.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
