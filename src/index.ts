@@ -10,8 +10,6 @@ import Fuse from 'fuse.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { ShortyHeader } from './components/shorty-header';
 
-export type { IShorty } from './types/IShorty';
-
 @customElement('hey-shorty')
 export class HeyShorty extends LitElement {
   static override styles = css`
@@ -107,7 +105,7 @@ export class HeyShorty extends LitElement {
       return true;
     },
   })
-  readonly data = [] as Array<IShorty>;
+  data = [] as Array<IShorty>;
 
   @property()
   placeholder = 'Search...';
