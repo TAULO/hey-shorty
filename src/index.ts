@@ -435,7 +435,6 @@ export class HeyShorty extends LitElement {
   override render() {
     return this._visible
       ? html`
-          <p>${this._selectedIndex}</p>
           <div
             class="underlay ${this._visible ? 'shorty-visible' : ''}"
             @click=${this._handleClickedOutside}
