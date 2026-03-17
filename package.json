@@ -1,6 +1,6 @@
 {
   "name": "@taulo1999/heyshorty",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A global search modal",
   "main": "dist/index.js",
   "type": "module",
