@@ -43,7 +43,7 @@ export class HeyShorty extends LitElement {
       --shorty-action-icon-size: 1.2em;
     }
 
-    .underlay {
+    .shorty-underlay {
       position: fixed;
       top: 0;
       left: 0;
@@ -184,7 +184,7 @@ export class HeyShorty extends LitElement {
   }
 
   private _handleClickedOutside(event: MouseEvent) {
-    if ((event.target as HTMLElement)?.classList.contains('underlay')) {
+    if ((event.target as HTMLElement)?.classList.contains('shorty-underlay')) {
       this._visible = false;
     }
   }
@@ -436,7 +436,7 @@ export class HeyShorty extends LitElement {
     return this._visible
       ? html`
           <div
-            class="underlay ${this._visible ? 'shorty-visible' : ''}"
+            class="shorty-underlay ${this._visible ? 'shorty-visible' : ''}"
             @click=${this._handleClickedOutside}
           >
             <div class="shorty">
