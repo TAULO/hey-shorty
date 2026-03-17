@@ -252,6 +252,7 @@ export class HeyShorty extends LitElement {
     this._searchResults = [];
     this._parentStack = [];
     this._breadcrumbs = [this.data[0].id];
+    this._currentLevelData = this.data;
   }
 
   override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
