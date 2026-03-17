@@ -105,6 +105,8 @@ export class HeyShorty extends LitElement {
       return true;
     },
   })
+
+  @property({ type: Array })
   data = [] as Array<IShorty>;
 
   @property()
