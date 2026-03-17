@@ -290,6 +290,13 @@ export class HeyShorty extends LitElement {
     // Search FIRST - before determining active data
     if (changedProperties.has('_search') || changedProperties.has('data')) {
       if (this._search && this._fuse) {
+        // global search if at top level else search current level
+        if (this._breadcrumbs.length === 1) {
+          this._fuse.setCollection(this._flattenData());
+        } else {
+          this._fuse.setCollection(this._currentLevelData);
+        }
+
         const result = this._fuse.search(this._search);
 
         const highlightedMatches = result.map(res => {
