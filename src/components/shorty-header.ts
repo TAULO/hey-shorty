@@ -5,8 +5,6 @@ import { createRef, ref } from 'lit/directives/ref.js';
 @customElement('shorty-header')
 export class ShortyHeader extends LitElement {
   static override styles = css`
-    /* noinspection CssUnresolvedCustomProperty */
-
     .shorty-header {
       display: flex;
       flex-direction: column;
@@ -26,8 +24,6 @@ export class ShortyHeader extends LitElement {
       flex-direction: row;
       gap: 0.5em;
     }
-
-    /* noinspection CssUnresolvedCustomProperty */
 
     .breadcrumb-list button {
       margin: 0;
@@ -49,8 +45,6 @@ export class ShortyHeader extends LitElement {
       gap: .8em;
       float: right;
     }
-
-    /* noinspection CssUnresolvedCustomProperty */
 
     .search-container input {
       border: none;

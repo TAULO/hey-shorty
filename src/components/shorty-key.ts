@@ -21,7 +21,7 @@ export class ShortyKey extends LitElement {
       font-weight: var(--shorty-key-font-weight);
       border: 1px solid #3f404d40;
       border-bottom-width: 2px;
-      background-color: oklch(97.8% 0.005 297.73);
+      background-color: var(--shorty-keys-color);
       text-align: center;
     }
   `;

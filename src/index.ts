@@ -24,11 +24,11 @@ export class HeyShorty extends LitElement {
 
       --shorty-key-border-radius: 0.25em;
       --shorty-keys-color: oklch(97.8% 0.005 297.73);
-      --shorty-border: 1px solid rgb(239, 241, 244);
-
-      --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
-      
       --shorty-key-font-size: 0.85em;
+
+      --shorty-border: 1px solid rgb(239, 241, 244);
+      
+      --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
 
       --shorty-secondary-background-color: rgb(239, 241, 244);
       --shorty-secondary-text-color: rgb(107, 111, 118);
