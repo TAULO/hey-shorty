@@ -33,7 +33,7 @@ export class ShortyHeader extends LitElement {
       margin: 0;
       padding: 2px 4px;
 
-      background: var(--shorty-key-background-color);
+      background: var(--shorty-breadcrumb-color);
       color: var(--shorty-text-color);
       border: none;
 
