@@ -45,6 +45,8 @@ export class HeyShorty extends LitElement {
       --shorty-placeholder-color: #8e8e8e;
 
       --shorty-action-icon-size: 1.2em;
+      
+      --shorty-background-when-visible: rgba(0, 0, 0, 0.1);
     }
 
     .shorty-underlay {
@@ -57,7 +59,7 @@ export class HeyShorty extends LitElement {
     }
 
     .shorty-visible {
-      background-color: rgba(0, 0, 0, 0.1);
+      background-color: var(--shorty-background-when-visible);
     }
 
     .shorty {
