@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html class="dark">
+<html class="">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -37,6 +37,34 @@
         /*--shorty-primary-color: #0d1117;*/
         /*--shorty-secondary-color: #ff6b00;*/
         /*--shorty-text-color: #ffffff;*/
+      }
+
+      html.dark {
+          background-color: #1a1b1e;
+      }
+
+      html.dark hey-shorty {
+          --shorty-primary-color: #1a1b1e;
+          --shorty-secondary-color: #ff6b00;
+          --shorty-text-color: #e1e3e8;
+          --shorty-font-family: 'Inter', system-ui, sans-serif;
+
+          --shorty-border: 1px solid rgba(255, 255, 255, 0.1);
+
+          --shorty-secondary-background-color: #2a2b2f;
+          --shorty-secondary-text-color: #9ca0a8;
+
+          --shorty-selected-background: #2a2b2f;
+
+          --shorty-keys-color: #2a2b2f;
+
+          --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-secondary-color) 90%, white 10%);
+
+          --shorty-content-shadow: rgb(0 0 0 / 70%) 0px 16px 70px;
+
+          --shorty-placeholder-color: #6b6f76;
+
+          --shorty-background-when-visible: rgba(0, 0, 0, 0.5);
       }
     </style>
     <hey-shorty></hey-shorty>
@@ -81,6 +109,27 @@
         rows[rows.length - 1]?.remove();
       }
 
+      function generateDeepData(depth) {
+        if (depth === 0) {
+          return { id: 'leaf', name: 'Leaf Item', icon: 'star' };
+        }
+
+        return {
+          id: `level-${depth}`,
+          name: `Level ${depth}`,
+          icon: 'folder',
+          children: [
+            generateDeepData(depth - 1),
+            { id: `sibling-${depth}`, name: `Sibling at ${depth}`, icon: 'note' },
+          ],
+        };
+      }
+
+      const darkTheme = () => document.documentElement.classList.add('dark');
+      const lightTheme = () => document.documentElement.classList.remove('dark');
+
+      const deepData = generateDeepData(100);
+
       const data = [
         // ── Navigation (flat, top-level actions) ──────────────────────
         {
@@ -91,6 +140,7 @@
           searchKeywords: ['dashboard', 'start', 'main'],
           handler: () => console.log('navigate → home'),
         },
+        deepData,
         {
           id: 'Projects',
           name: 'Go to Projects',
@@ -127,14 +177,14 @@
               name: 'Light',
               icon: 'light_mode',
               hotkeys: ['cmd', 'shift', 'l'],
-              handler: () => console.log('theme → light'),
+              handler: () => lightTheme(),
             },
             {
               id: 'theme-dark',
               name: 'Dark',
               icon: 'dark_mode',
               hotkeys: ['cmd', 'shift', 'd'],
-              handler: () => console.log('theme → dark'),
+              handler: () => darkTheme(),
             },
             {
               id: 'theme-system',
@@ -379,13 +429,19 @@
               name: 'About Shorty',
               icon: 'info',
               handler: () => console.log('about dialog'),
-            },
+            }
           ],
         },
       ];
       const empty = [];
 
       const shorty = document.querySelector('hey-shorty');
+
+      console.log(shorty);
+
+      console.log(shorty.defaultBreadcrumb)
+
+      shorty.defaultBreadcrumb = 'FooBar';
       shorty.data = data;
     </script>
   </body>
