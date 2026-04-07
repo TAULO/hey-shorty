@@ -82,7 +82,7 @@ export class ShortyBody extends LitElement {
                 <shorty-action
                 .action="${action}"
                 .selected="${this.selectedIndex === index}"
-                @mouseover=${(event: MouseEvent) => this._actionFocused(index, event)}   
+                @mousemove=${(event: MouseEvent) => this._actionFocused(index, event)}   
         "></shorty-action>
     `;
             })}
