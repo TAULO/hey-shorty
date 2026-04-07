@@ -42,7 +42,7 @@ export class ShortyHeader extends LitElement {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: .8em;
+      gap: 0.8em;
       float: right;
     }
 
@@ -60,6 +60,11 @@ export class ShortyHeader extends LitElement {
     .search-container mwc-icon {
       color: var(--shorty-secondary-text-color);
       font-size: var(--shorty-action-icon-size);
+    }
+
+    .breadcrumb-button:hover:not(:last-child) {
+      cursor: pointer;
+      outline: 1px solid var(--shorty-secondary-color);
     }
   `;
 
@@ -87,6 +92,17 @@ export class ShortyHeader extends LitElement {
     );
   }
 
+  private _handleBreadcrumbClick(event: Event) {
+    const button = event.target as HTMLButtonElement;
+    this.dispatchEvent(
+      new CustomEvent('breadcrumb-click', {
+        detail: { breadcrumb: button.textContent },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
   private _inputRef = createRef<HTMLInputElement>();
 
   override firstUpdated() {
@@ -97,7 +113,11 @@ export class ShortyHeader extends LitElement {
     return html`
       <div class="shorty-header">
         <div class="breadcrumb-list">
-          ${this.breadcrumbs.map(breadcrumb => html` <button>${breadcrumb}</button> `)}
+          ${this.breadcrumbs.map(
+            (breadcrumb, index) => html`
+              <button class=breadcrumb-button @click=${this._handleBreadcrumbClick}>${breadcrumb}</button>
+            `,
+          )}
         </div>
         <div class="search-container">
           <mwc-icon>search</mwc-icon>

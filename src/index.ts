@@ -27,7 +27,7 @@ export class HeyShorty extends LitElement {
       --shorty-key-font-size: 0.85em;
 
       --shorty-border: 1px solid rgb(239, 241, 244);
-      
+
       --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-primary-color) 90%, black 10%);
 
       --shorty-secondary-background-color: rgb(239, 241, 244);
@@ -45,7 +45,7 @@ export class HeyShorty extends LitElement {
       --shorty-placeholder-color: #8e8e8e;
 
       --shorty-action-icon-size: 1.2em;
-      
+
       --shorty-background-when-visible: rgba(0, 0, 0, 0.1);
     }
 
@@ -252,6 +252,26 @@ export class HeyShorty extends LitElement {
     this._selectedIndex = event.detail.index;
   }
 
+  private _handleBreadcrumbClicked(event: CustomEvent<{ breadcrumb: string }>) {
+    const buttonText = event.detail.breadcrumb;
+    const index = this._breadcrumbs.indexOf(buttonText);
+
+    if (index === -1) return;
+    if (this._breadcrumbs.length === 1) return;
+
+    const popCount = (this._breadcrumbs.length - 1) - index;
+
+    for (let i = 0; i < popCount; i++) {
+      const parent = this._parentStack.pop();
+      if (parent) {
+        this._currentLevelData = parent;
+        this._activeData = parent;
+      }
+    }
+
+    this._breadcrumbs = this._breadcrumbs.slice(0, index + 1);
+  }
+
   private _resetState() {
     this._search = '';
     this._selectedIndex = 0;
@@ -452,6 +472,7 @@ export class HeyShorty extends LitElement {
                 .search=${this._search}
                 placeholder=${this.placeholder}
                 @search=${this._handleInputSearch}
+                @breadcrumb-click=${this._handleBreadcrumbClicked}
               ></shorty-header>
               <shorty-content
                 .data=${this._activeData.slice(0, this.maxSearchResults)}
