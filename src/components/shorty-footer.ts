@@ -6,10 +6,9 @@ import { IShorty } from '../types/IShorty';
 export class ShortyFooter extends LitElement {
   static override styles = css`
     .shorty-footer {
-      display: flex;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: 1fr auto auto; /* hints | line | actions */
       align-items: center;
-      justify-content: end;
       gap: 1em;
       background: color-mix(in srgb, var(--shorty-primary-color) 90%, black 1%);
       margin-top: auto;
@@ -30,7 +29,14 @@ export class ShortyFooter extends LitElement {
       margin: 0;
       padding: 0;
     }
-
+    
+    .shorty-footer .action {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    
     .shorty-footer .line {
       width: 1px;
       height: 0.8em;
@@ -68,7 +74,7 @@ export class ShortyFooter extends LitElement {
           <div class="shorty-footer">
             ${this._showHints(this.action).map(
               hint => html`
-                <div>
+                <div class="action">
                   <span class="help">${hint.label}</span>
                   ${hint.keys.map(key => html` <shorty-key hotkey="${key}"></shorty-key> `)}
                 </div>
