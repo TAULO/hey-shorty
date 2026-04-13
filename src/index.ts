@@ -6,6 +6,7 @@ import { IShorty } from './types/IShorty';
 import './components/shorty-header';
 import './components/shorty-content';
 import './components/shorty-footer';
+import './components/shorty-action-preview';
 import Fuse from 'fuse.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { ShortyHeader } from './components/shorty-header';
@@ -224,6 +225,7 @@ export class HeyShorty extends LitElement {
     this._shortyHeader.value?.focusSearch();
     this._selectedIndex = 0;
     this._searchResults = [];
+    this._currentAction = this._activeData[0];
   }
 
   private _handleAction() {
@@ -243,6 +245,7 @@ export class HeyShorty extends LitElement {
       this._breadcrumbs = [...this._breadcrumbs, selectedAction.id];
       this._currentLevelData = selectedAction.children;
       this._activeData = selectedAction.children;
+      this._currentAction = this._activeData[0];
     }
 
     this._resetAfterAction();
@@ -259,7 +262,7 @@ export class HeyShorty extends LitElement {
     if (index === -1) return;
     if (this._breadcrumbs.length === 1) return;
 
-    const popCount = (this._breadcrumbs.length - 1) - index;
+    const popCount = this._breadcrumbs.length - 1 - index;
 
     for (let i = 0; i < popCount; i++) {
       const parent = this._parentStack.pop();
@@ -270,6 +273,8 @@ export class HeyShorty extends LitElement {
     }
 
     this._breadcrumbs = this._breadcrumbs.slice(0, index + 1);
+    this._selectedIndex = 0;
+    this._currentAction = this._activeData[0];
   }
 
   private _resetState() {
@@ -421,6 +426,7 @@ export class HeyShorty extends LitElement {
         this._currentLevelData = parent;
         this._activeData = parent;
         this._breadcrumbs = this._breadcrumbs.slice(0, -1);
+        this._currentAction = this._activeData[0];
       }
     });
 
@@ -481,6 +487,14 @@ export class HeyShorty extends LitElement {
                 @selected-index-changed=${this._handleSelectedIndexChanged}
               ></shorty-content>
               <shorty-footer .action=${this._currentAction}></shorty-footer>
+              ${
+                this._currentAction && this._currentAction.preview
+                  ? html`<shorty-action-preview
+                      .preview=${this._currentAction.preview}
+                    ></shorty-action-preview>`
+                  : undefined
+              }
+            </div>
             </div>
           </div>
         `

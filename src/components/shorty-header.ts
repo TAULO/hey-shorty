@@ -36,7 +36,7 @@ export class ShortyHeader extends LitElement {
       border-radius: var(--shorty-key-border-radius);
       font-size: var(--shorty-key-font-size);
       text-align: center;
-      max-width: 100px;
+      max-width: 150px;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
