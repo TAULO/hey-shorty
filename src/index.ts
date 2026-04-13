@@ -192,7 +192,7 @@ export class HeyShorty extends LitElement {
 
   private _handleClickedOutside(event: MouseEvent) {
     if ((event.target as HTMLElement)?.classList.contains('shorty-underlay')) {
-      this._visible = false;
+      this._resetState();
     }
   }
 
@@ -235,7 +235,6 @@ export class HeyShorty extends LitElement {
 
     if (selectedAction.handler) {
       selectedAction.handler();
-      this._visible = false;
       this._resetState();
       return;
     }
@@ -278,6 +277,7 @@ export class HeyShorty extends LitElement {
   }
 
   private _resetState() {
+    this._visible = false;
     this._search = '';
     this._selectedIndex = 0;
     this._searchResults = [];
@@ -395,7 +395,6 @@ export class HeyShorty extends LitElement {
 
     hotkeys(this.closeShortyHotkey, (keyboardEvent, hotkeysEvent) => {
       keyboardEvent.preventDefault();
-      this._visible = false;
       this._resetState();
     });
 
