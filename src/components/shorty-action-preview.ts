@@ -10,8 +10,9 @@ export class ShortyActionPreview extends LitElement {
       bottom: 0;
       left: 100%;
       margin-left: 1em;
+      padding: .5em;
       width: 250px;
-      height: 25%;
+      min-height: 25%;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -43,7 +44,6 @@ export class ShortyActionPreview extends LitElement {
       align-items: center;
       justify-content: center;
 
-      /* Cross-fade when the inner content swaps */
       animation: content-fade 0.2s ease both;
     }
 
