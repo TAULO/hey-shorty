@@ -40,31 +40,31 @@
       }
 
       html.dark {
-          background-color: #1a1b1e;
+        background-color: #1a1b1e;
       }
 
       html.dark hey-shorty {
-          --shorty-primary-color: #1a1b1e;
-          --shorty-secondary-color: #ff6b00;
-          --shorty-text-color: #e1e3e8;
-          --shorty-font-family: 'Inter', system-ui, sans-serif;
+        --shorty-primary-color: #1a1b1e;
+        --shorty-secondary-color: #ff6b00;
+        --shorty-text-color: #e1e3e8;
+        --shorty-font-family: 'Inter', system-ui, sans-serif;
 
-          --shorty-border: 1px solid rgba(255, 255, 255, 0.1);
+        --shorty-border: 1px solid rgba(255, 255, 255, 0.1);
 
-          --shorty-secondary-background-color: #2a2b2f;
-          --shorty-secondary-text-color: #9ca0a8;
+        --shorty-secondary-background-color: #2a2b2f;
+        --shorty-secondary-text-color: #9ca0a8;
 
-          --shorty-selected-background: #2a2b2f;
+        --shorty-selected-background: #2a2b2f;
 
-          --shorty-keys-color: #2a2b2f;
+        --shorty-keys-color: #2a2b2f;
 
-          --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-secondary-color) 90%, white 10%);
+        --shorty-breadcrumb-color: color-mix(in srgb, var(--shorty-secondary-color) 90%, white 10%);
 
-          --shorty-content-shadow: rgb(0 0 0 / 70%) 0px 16px 70px;
+        --shorty-content-shadow: rgb(0 0 0 / 70%) 0px 16px 70px;
 
-          --shorty-placeholder-color: #6b6f76;
+        --shorty-placeholder-color: #6b6f76;
 
-          --shorty-background-when-visible: rgba(0, 0, 0, 0.5);
+        --shorty-background-when-visible: rgba(0, 0, 0, 0.5);
       }
     </style>
     <hey-shorty></hey-shorty>
@@ -86,28 +86,21 @@
     <script lang="ts" type="module">
       const tbody = document.querySelector('table tbody');
 
-      function addItemToTable(name, age) {
-        if (!tbody) return;
-
-        const row = document.createElement('tr');
-
-        const nameCell = document.createElement('td');
-        nameCell.textContent = name;
-        row.appendChild(nameCell);
-
-        const ageCell = document.createElement('td');
-        ageCell.textContent = String(age);
-        row.appendChild(ageCell);
-
-        tbody.appendChild(row);
-      }
-
-      function removeItemFromTable(name) {
-        if (!tbody) return;
-
-        const rows = tbody.querySelectorAll('tr');
-        rows[rows.length - 1]?.remove();
-      }
+      const bookPreview = (title, author, rating, imageUrl) => {
+        return `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:4px">
+      <div style="position:relative;width:100%;aspect-ratio:2/3;border-radius:6px;overflow:hidden">
+        <img src="${imageUrl}"
+             style="width:100%;height:100%;object-fit:cover;display:block"
+             alt="${title}" />
+      </div>
+        <div style="display:flex;flex-direction:column;gap:4px; justify-content:center; align-items: center; text-align: center;">
+          <div style="font-size:13px;font-weight:500;">${title}</div>
+          <div style="font-size:11px;opacity:0.6;">${author}</div>
+          ${rating ? `<svg class="star" viewBox="0 0 16 16"><polygon points="8,1 10.2,5.5 15,6.2 11.5,9.6 12.3,14.5 8,12.2 3.7,14.5 4.5,9.6 1,6.2 5.8,5.5" fill="var(--color-border-tertiary)"></polygon></svg>` : ''}
+        </div>
+      </div>`;
+      };
 
       function generateDeepData(depth) {
         if (depth === 0) {
@@ -130,6 +123,63 @@
 
       const deepData = generateDeepData(10);
 
+      const currentlyReadingTest = [
+        {
+          id: 459452,
+          title: 'Oathbringer',
+          pages: 1243,
+          slug: 'oathbringer',
+          image: {
+            url: 'https://assets.hardcover.app/external_data/42422093/ea15fb4de9d1cf70cd3606c1710e83fc8075826a.jpeg',
+          },
+          contributions: [
+            {
+              author: {
+                name: 'Brandon Sanderson',
+              },
+            },
+          ],
+          author: 'Brandon Sanderson',
+          rating: 5,
+        },
+        {
+          id: 340247,
+          title: 'Debt: The First 5,000 Years',
+          pages: 534,
+          slug: 'debt',
+          image: {
+            url: 'https://assets.hardcover.app/external_data/59533990/5a9ddbe5b1631a0e0d70fa996fa7f44c62cf1cea.jpeg',
+          },
+          contributions: [
+            {
+              author: {
+                name: 'David Graeber',
+              },
+            },
+          ],
+          author: 'David Graeber',
+          rating: null,
+        },
+        {
+          id: 429156,
+          title: 'Clean Code: A Handbook of Agile Software Craftsmanship',
+          pages: 464,
+          slug: 'clean-code',
+          image: {
+            url: 'https://assets.hardcover.app/edition/16980977/b7614d13039583275245ff024f2014b6b9f0fac8.jpeg',
+          },
+          contributions: [
+            {
+              author: {
+                name: 'Robert C. Martin',
+              },
+            },
+          ],
+          author: 'Robert C. Martin',
+          rating: 4,
+        },
+      ];
+
       const data = [
         // ── Navigation (flat, top-level actions) ──────────────────────
         {
@@ -138,8 +188,22 @@
           hotkeys: ['cmd', 'h'],
           icon: 'home',
           searchKeywords: ['dashboard', 'start', 'main'],
-          handler: () => console.log('navigate → home'),
-          preview: '<div style="padding: 1em; text-align: center;"><strong>🏠 Home Dashboard</strong><p style="margin: 0.5em 0 0; font-size: 0.85em; color: gray;">Navigate to the main dashboard with your recent activity and quick links.</p></div>',
+          children: currentlyReadingTest.map(book => {
+            const title = book.title;
+            const author = book.author;
+            const rating = book.rating ?? null;
+            const imageUrl = book?.image?.url;
+
+            return {
+              id: title,
+              name: title,
+              icon: 'auto_stories',
+              handler: () => {
+                return window.open(`https://hardcover.app/books/${book.slug}`, '_blank');
+              },
+              preview: bookPreview(title, author, rating, imageUrl),
+            };
+          }),
         },
         deepData,
         {
@@ -430,7 +494,7 @@
               name: 'About Shorty',
               icon: 'info',
               handler: () => console.log('about dialog'),
-            }
+            },
           ],
         },
       ];
@@ -440,7 +504,7 @@
 
       console.log(shorty);
 
-      console.log(shorty.defaultBreadcrumb)
+      console.log(shorty.defaultBreadcrumb);
 
       shorty.defaultBreadcrumb = 'FooBar';
       shorty.data = data;
