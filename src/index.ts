@@ -147,7 +147,10 @@ export class HeyShorty extends LitElement {
   @property({ type: Boolean })
   highlightMatches = true;
 
-  @property({ type: Array })
+  @property()
+  defaultBreadcrumbName?: string;
+
+  @state()
   private _breadcrumbs: Array<string> = [];
 
   @state()
@@ -174,6 +177,10 @@ export class HeyShorty extends LitElement {
   private _fuse: Fuse<IShorty> | undefined;
 
   private _shortyHeader = createRef<ShortyHeader>();
+
+  private get _defaultBreadcrumbName() {
+    return (this.defaultBreadcrumbName ?? this.data[0]?.id) || 'Mission Control';
+  }
 
   private _toggle() {
     this._visible = !this._visible;
@@ -258,8 +265,7 @@ export class HeyShorty extends LitElement {
     const buttonText = event.detail.breadcrumb;
     const index = this._breadcrumbs.indexOf(buttonText);
 
-    if (index === -1) return;
-    if (this._breadcrumbs.length === 1) return;
+    if (this._breadcrumbs.length === 1 || index === -1) return;
 
     const popCount = this._breadcrumbs.length - 1 - index;
 
@@ -282,14 +288,14 @@ export class HeyShorty extends LitElement {
     this._selectedIndex = 0;
     this._searchResults = [];
     this._parentStack = [];
-    this._breadcrumbs = [this.data[0].id];
+    this._breadcrumbs = [this._defaultBreadcrumbName];
     this._currentLevelData = this.data;
   }
 
   override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
     if (changedProperties.has('data')) {
       if (this._breadcrumbs.length === 0 && this.data[0]) {
-        this._breadcrumbs = [this.data[0].id];
+        this._breadcrumbs = [this._defaultBreadcrumbName];
         this._currentAction = this.data[0];
       }
 
