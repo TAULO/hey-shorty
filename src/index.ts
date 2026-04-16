@@ -511,4 +511,10 @@ declare global {
   interface HTMLElementTagNameMap {
     'hey-shorty': HeyShorty;
   }
+
+  namespace JSX {
+    interface IntrinsicElements {
+      'hey-shorty': any;
+    }
+  }
 }
